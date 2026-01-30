@@ -1,0 +1,32 @@
+import { z } from "zod";
+
+export const ConfigSchema = z.object({
+  svc: z.object({
+    port: z.number().default(3030),
+    db: z.object({
+      mongo: z.object({
+        url: z.string(),
+      }),
+      redis: z.object({
+        url: z.string(),
+      }),
+    }),
+    rnd: z.object({
+      rndorg: z.object({
+        enabled: z.boolean().default(true),
+        token: z.string().optional(),
+      }),
+      urandom: z.object({
+        enabled: z.boolean().default(true),
+      }),
+    }),
+    stt: z.object({
+      enabled: z.boolean().default(true),
+    }),
+    csot: z.object({
+      token: z.string(),
+    }),
+  }),
+});
+
+export type AppConfig = z.infer<typeof ConfigSchema>;

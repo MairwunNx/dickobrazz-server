@@ -18,7 +18,7 @@ export const generateRandomOrgIntegers = async (apiKey: string, min: number, max
 
   try {
     const numbers = await client.generateIntegers(count, min, max);
-    const numbers0 = numbers.map(val => (typeof val === 'number' ? val : parseInt(String(val), 10)));
+    const numbers0 = numbers.map((val) => (typeof val === "number" ? val : parseInt(String(val), 10)));
 
     if (!numbers || !Array.isArray(numbers)) {
       logger.warn("Random.org API returned invalid data", {

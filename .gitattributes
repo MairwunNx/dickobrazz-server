@@ -1,0 +1,70 @@
+* text=auto eol=lf
+
+*.ts text eol=lf linguist-language=TypeScript
+*.tsx text eol=lf linguist-language=TypeScript
+*.mts text eol=lf linguist-language=TypeScript
+*.cts text eol=lf linguist-language=TypeScript
+
+*.js text eol=lf linguist-language=JavaScript
+*.mjs text eol=lf linguist-language=JavaScript
+*.cjs text eol=lf linguist-language=JavaScript
+
+# JSON files
+*.json text eol=lf
+*.jsonc text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf linguist-generated=true
+tsconfig.json text eol=lf
+biome.json text eol=lf
+
+# YAML files
+*.yaml text eol=lf
+*.yml text eol=lf
+config.yaml text eol=lf
+
+# TOML files
+*.toml text eol=lf
+
+# Markdown
+*.md text eol=lf linguist-documentation
+
+# Docker
+Dockerfile text eol=lf linguist-language=Dockerfile
+Dockerfile.* text eol=lf linguist-language=Dockerfile
+**/Dockerfile* linguist-language=Dockerfile
+docker-compose.yml text eol=lf
+docker-compose.yaml text eol=lf
+.dockerignore text eol=lf
+
+# Environment files
+*.env text eol=lf
+.env* text eol=lf
+
+# Config files
+.editorconfig text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.cursorignore text eol=lf
+.prettierrc text eol=lf
+.eslintrc text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Lock files (treat as binary, don't merge)
+bun.lockb binary
+package-lock.json binary linguist-generated=true
+yarn.lock binary linguist-generated=true
+pnpm-lock.yaml binary linguist-generated=true
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary

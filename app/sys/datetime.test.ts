@@ -3,10 +3,7 @@ import { formatMoscowISO, getMoscowDate, getMoscowDayEnd, getMoscowDayStart, isS
 
 describe("datetime (Moscow)", () => {
   it("getMoscowDate возвращает московское время", () => {
-    const nowMoscow = new Date(
-      new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })
-    ).getTime();
-
+    const nowMoscow = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Moscow" })).getTime();
     const moscow = getMoscowDate().getTime();
     expect(Math.abs(moscow - nowMoscow)).toBeLessThan(1000); // 1 сек допуск
   });

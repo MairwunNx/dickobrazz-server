@@ -1,3 +1,10 @@
+/*
+  Ахтунг!
+
+  Это не будет работать для отрицательных чисел!
+  Реализация предназначена только для положительных чисел,
+  так как только так мне и нужно.
+*/
 export const secureRandomInRange = (min: number, max: number): number => {
   if (min >= max) throw new Error("Max must be greater than min");
 

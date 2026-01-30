@@ -1,0 +1,17 @@
+svc:
+  port: 3030
+  db:
+    mongo:
+      url: "${MONGO_URL}"
+    redis:
+      url: "${REDIS_URL}"
+  rnd:
+    rndorg:
+      enabled: true
+      token: "${RANDOMORG_TOKEN}"
+    urandom:
+      enabled: true
+  stt:
+    enabled: true
+  csot:
+    token: "${CROSS_SERVER_TOKEN}"

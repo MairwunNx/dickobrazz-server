@@ -1,18 +1,13 @@
+import type { BunRequest } from "bun";
 import type { RequestContext } from "@/cmd/context";
 import { createTicker, logger } from "@/log";
 import { validateRequest } from "@/svc/auth/service";
 import { AuthError } from "@/sys/errors";
 
-export const authenticateRequest = async (
-  headers: Headers,
-  botToken: string,
-  csotToken: string,
-  sessionSecret: string,
-  context: RequestContext
-): Promise<void> => {
+export const authenticateRequest = async (req: BunRequest, botToken: string, csotToken: string, sessionSecret: string, context: RequestContext): Promise<void> => {
   const ticker = createTicker();
 
-  const authResult = await validateRequest(headers, botToken, csotToken, sessionSecret);
+  const authResult = await validateRequest(req, botToken, csotToken, sessionSecret);
 
   context.is_authenticated = authResult.authenticated;
   context.auth_type = authResult.auth_type;

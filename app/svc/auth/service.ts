@@ -38,7 +38,7 @@ export const validateInternalToken = (token: string, expectedToken: string): boo
   return isValid;
 };
 
-export const validateRequest = async (headers: Headers, botToken: string, csotToken: string): Promise<AuthResult> => {
+export const validateRequest = async (headers: Headers, _botToken: string, csotToken: string): Promise<AuthResult> => {
   const internalToken = headers.get("x-internal-token");
   if (internalToken) {
     const isValid = validateInternalToken(internalToken, csotToken);

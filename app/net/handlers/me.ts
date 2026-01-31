@@ -1,5 +1,5 @@
-import type { Handler } from "@/cmd/types";
 import { getContext } from "@/cmd/context";
+import type { Handler } from "@/cmd/types";
 import { UpdatePrivacyPayloadSchema } from "@/dto/user";
 import { errorResponse, successResponse } from "@/net/responses";
 import { getProfile, updatePrivacy } from "@/svc/users/service";

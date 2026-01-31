@@ -1,10 +1,12 @@
 import { z } from "zod";
 
 export const UserProfileSchema = z.object({
-  user_id: z.number(),
+  id: z.number(),
   username: z.string().optional(),
-  is_hidden: z.boolean().default(false),
-  updated_at: z.date().optional(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  photo_url: z.string().optional(),
+  is_hidden: z.boolean(),
 });
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;

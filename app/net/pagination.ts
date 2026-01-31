@@ -11,9 +11,5 @@ export const parsePaginationParams = (url: URL): { limit?: number; page?: number
 };
 
 export const createPageMeta = (limit: number, total: number, page?: number): PageMeta => {
-  return {
-    limit,
-    page,
-    total,
-  };
+  return { limit, page, total };
 };

@@ -1,7 +1,8 @@
 import { authLoginHandler } from "@/net/handlers/auth";
 import {
   cockAchievementsHandler,
-  cockDynamicHandler,
+  cockDynamicGlobalHandler,
+  cockDynamicPersonalHandler,
   cockLadderHandler,
   cockRaceHandler,
   cockRulerHandler,
@@ -35,12 +36,13 @@ export const routes: Route[] = [
   { method: "GET", path: "/api/v1/me", handler: h(async (_req, ctx) => await meHandler(ctx)), protected: true },
   { method: "PATCH", path: "/api/v1/me/privacy", handler: h(async (req, ctx) => await updatePrivacyHandler(req, ctx)), protected: true },
   { method: "POST", path: "/api/v1/cock/size", handler: h(async (_req, ctx) => await cockSizeHandler(ctx)), protected: true },
-  { method: "GET", path: "/api/v1/cock/ruler", handler: h(cockRulerHandler), protected: true },
-  { method: "GET", path: "/api/v1/cock/race", handler: h(cockRaceHandler), protected: true },
-  { method: "GET", path: "/api/v1/cock/dynamic", handler: h(async (_req, ctx) => await cockDynamicHandler(ctx)), protected: true },
+  { method: "GET", path: "/api/v1/cock/ruler", handler: h(cockRulerHandler), protected: false },
+  { method: "GET", path: "/api/v1/cock/race", handler: h(cockRaceHandler), protected: false },
+  { method: "GET", path: "/api/v1/cock/dynamic/global", handler: h(async () => await cockDynamicGlobalHandler()), protected: false },
+  { method: "GET", path: "/api/v1/cock/dynamic/personal", handler: h(async (_req, ctx) => await cockDynamicPersonalHandler(ctx)), protected: true },
   { method: "GET", path: "/api/v1/cock/achievements", handler: h(cockAchievementsHandler), protected: true },
-  { method: "GET", path: "/api/v1/cock/ladder", handler: h(cockLadderHandler), protected: true },
-  { method: "GET", path: "/api/v1/cock/seasons", handler: h(cockSeasonsHandler), protected: true },
+  { method: "GET", path: "/api/v1/cock/ladder", handler: h(cockLadderHandler), protected: false },
+  { method: "GET", path: "/api/v1/cock/seasons", handler: h(cockSeasonsHandler), protected: false },
 ];
 
 export const matchRoute = (method: string, pathname: string): Route | null => {

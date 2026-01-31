@@ -1,7 +1,7 @@
 import type { RequestContext } from "@/cmd/context";
 import { parsePaginationParams } from "@/net/pagination";
 import { successResponse } from "@/net/responses";
-import { getAchievements, getDynamic, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
+import { getAchievements, getDynamicGlobal, getDynamicPersonal, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
 
 export const cockSizeHandler = async (context: RequestContext): Promise<Response> => {
   if (!context.user) {
@@ -40,12 +40,17 @@ export const cockRaceHandler = async (req: Request, context: RequestContext): Pr
   return successResponse(result);
 };
 
-export const cockDynamicHandler = async (context: RequestContext): Promise<Response> => {
+export const cockDynamicGlobalHandler = async (): Promise<Response> => {
+  const result = await getDynamicGlobal();
+  return successResponse(result);
+};
+
+export const cockDynamicPersonalHandler = async (context: RequestContext): Promise<Response> => {
   if (!context.user) {
     throw new Error("User not authenticated");
   }
 
-  const result = await getDynamic(context.user.id);
+  const result = await getDynamicPersonal(context.user.id);
   return successResponse(result);
 };
 

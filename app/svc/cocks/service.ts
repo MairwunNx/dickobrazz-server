@@ -1,5 +1,5 @@
 import type { CockAchievementsResponse } from "@/dto/cock/achievements";
-import type { CockDynamicResponse } from "@/dto/cock/dynamics";
+import type { CockDynamicGlobalResponse, CockDynamicResponse } from "@/dto/cock/dynamics";
 import type { CockLadderResponse, CockRulerResponse } from "@/dto/cock/leaderboard";
 import type { CockRaceResponse } from "@/dto/cock/race";
 import type { CockSeasonsResponse } from "@/dto/cock/seasons";
@@ -83,10 +83,43 @@ export const getRace = async (params: GetLeaderboardParams): Promise<CockRaceRes
   return result;
 };
 
-export const getDynamic = async (userId: number): Promise<CockDynamicResponse> => {
+export const getDynamicGlobal = async (): Promise<CockDynamicGlobalResponse> => {
   const ticker = createTicker();
 
-  const result = {
+  const result: CockDynamicGlobalResponse = {
+    overall: {
+      total_size: 0,
+      unique_users: 0,
+      recent: {
+        average: 0,
+        median: 0,
+      },
+      distribution: {
+        huge_percent: 0,
+        little_percent: 0,
+      },
+      record: {
+        requested_at: new Date().toISOString(),
+        total: 0,
+      },
+      total_cocks_count: 0,
+      growth_speed: 0,
+    },
+  };
+
+  logger.info("Get global cock dynamics (stub)", {
+    service: "cocks",
+    operation: "getDynamicGlobal",
+    duration_ms: ticker(),
+  });
+
+  return result;
+};
+
+export const getDynamicPersonal = async (userId: number): Promise<CockDynamicResponse> => {
+  const ticker = createTicker();
+
+  const result: CockDynamicResponse = {
     overall: {
       total_size: 0,
       unique_users: 0,
@@ -131,9 +164,9 @@ export const getDynamic = async (userId: number): Promise<CockDynamicResponse> =
     },
   };
 
-  logger.info("Get cock dynamics (stub)", {
+  logger.info("Get personal cock dynamics (stub)", {
     service: "cocks",
-    operation: "getDynamic",
+    operation: "getDynamicPersonal",
     user_id: userId,
     duration_ms: ticker(),
   });

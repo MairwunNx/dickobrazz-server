@@ -56,7 +56,12 @@ export const CockDynamicResponseSchema = z.object({
   individual: CockDynamicIndividualSchema,
 });
 
+export const CockDynamicGlobalResponseSchema = z.object({
+  overall: CockDynamicOverallSchema,
+});
+
 export type CockDynamicResponse = z.infer<typeof CockDynamicResponseSchema>;
+export type CockDynamicGlobalResponse = z.infer<typeof CockDynamicGlobalResponseSchema>;
 export type CockDynamicOverall = z.infer<typeof CockDynamicOverallSchema>;
 export type CockDynamicIndividual = z.infer<typeof CockDynamicIndividualSchema>;
 export type CockDynamicRecentStat = z.infer<typeof CockDynamicRecentStatSchema>;

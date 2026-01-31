@@ -9,7 +9,7 @@ export const connectRedis = async (url: string): Promise<RedisClient> => {
   try {
     logger.info("Connecting to Redis", { service: "redis", operation: "connect" });
 
-    client = new RedisClient(url);
+    client = new RedisClient(url, { connectionTimeout: 5000 });
     await client.ping();
 
     logger.info("Redis connected", { service: "redis", operation: "connect" });

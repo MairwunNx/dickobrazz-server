@@ -18,6 +18,8 @@ type Handler = (req: Request, context: RequestContext, config: HandlerConfig) =>
 
 interface HandlerConfig {
   botToken: string;
+  sessionSecret: string;
+  sessionTtlSec: number;
 }
 
 interface Route {
@@ -32,7 +34,12 @@ const h = <T extends Handler>(fn: T) => fn;
 export const routes: Route[] = [
   { method: "GET", path: "/health", handler: h(async () => await healthHandler()), protected: false },
   { method: "GET", path: "/metrics", handler: h(async () => await metricsHandler()), protected: false },
-  { method: "POST", path: "/api/v1/auth/login", handler: h(async (req, _ctx, cfg) => await authLoginHandler(req, cfg.botToken)), protected: false },
+  {
+    method: "POST",
+    path: "/api/v1/auth/login",
+    handler: h(async (req, _ctx, cfg) => await authLoginHandler(req, cfg.botToken, cfg.sessionSecret, cfg.sessionTtlSec)),
+    protected: false,
+  },
   { method: "GET", path: "/api/v1/me", handler: h(async (_req, ctx) => await meHandler(ctx)), protected: true },
   { method: "PATCH", path: "/api/v1/me/privacy", handler: h(async (req, ctx) => await updatePrivacyHandler(req, ctx)), protected: true },
   { method: "POST", path: "/api/v1/cock/size", handler: h(async (_req, ctx) => await cockSizeHandler(ctx)), protected: true },

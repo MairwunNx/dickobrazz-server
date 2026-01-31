@@ -1,4 +1,5 @@
 import type { AuthResponse, TelegramAuthPayload } from "@/dto/auth";
+import type { UserProfile } from "@/dto/user";
 import { createTicker, logger } from "@/log";
 import { AuthError } from "@/sys/errors";
 import { validateTelegramAuthPayload } from "./telegram";
@@ -43,9 +44,28 @@ export const validateRequest = async (headers: Headers, _botToken: string, csotT
   if (internalToken) {
     const isValid = validateInternalToken(internalToken, csotToken);
     if (isValid) {
+      const internalUserId = headers.get("x-internal-user-id");
+      let user: UserProfile | undefined;
+      if (internalUserId) {
+        const parsed = Number.parseInt(internalUserId, 10);
+        if (!Number.isFinite(parsed) || parsed <= 0) {
+          throw new AuthError("Invalid internal user id", "AUTH_INVALID");
+        }
+
+        user = {
+          id: parsed,
+          username: undefined,
+          first_name: undefined,
+          last_name: undefined,
+          photo_url: undefined,
+          is_hidden: false,
+        };
+      }
+
       return {
         authenticated: true,
         auth_type: "internal",
+        user,
       };
     }
 

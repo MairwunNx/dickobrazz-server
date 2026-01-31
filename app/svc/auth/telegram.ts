@@ -29,7 +29,7 @@ export const validateTelegramAuthPayload = (payload: TelegramAuthPayload, botTok
     if (payload.hash.length !== computedHash.length) {
       throw new AuthError("Telegram auth payload hash mismatch", "AUTH_INVALID");
     }
-    const hashMatches = timingSafeEqual(Buffer.from(computedHash), Buffer.from(payload.hash));
+    const hashMatches = timingSafeEqual(Buffer.from(computedHash, "hex"), Buffer.from(payload.hash, "hex"));
     if (!hashMatches) {
       throw new AuthError("Telegram auth payload hash mismatch", "AUTH_INVALID");
     }

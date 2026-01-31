@@ -19,7 +19,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"],
-      "@randomorg/core": ["./node_modules/@randomorg/core/types/index.d.ts"],
+      "@randomorg/core": ["./node_modules/@randomorg/core/types/index.d.ts"]
     },
 
     // Best practices

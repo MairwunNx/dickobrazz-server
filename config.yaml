@@ -16,3 +16,6 @@ svc:
     enabled: true
   csot:
     token: "${CROSS_SERVER_TOKEN}"
+  auth:
+    session_secret: "${SESSION_SECRET}"
+    session_ttl_sec: ${SESSION_TTL_SEC:-604800}

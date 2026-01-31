@@ -5,25 +5,28 @@ export const LeaderboardEntrySchema = z.object({
   user_id: z.number(),
   nickname: z.string(),
   size: z.number(),
-  rank: z.number(),
 });
 
 export const UserNeighborhoodSchema = z.object({
-  above: LeaderboardEntrySchema.array().optional(),
-  current: LeaderboardEntrySchema.optional(),
-  below: LeaderboardEntrySchema.array().optional(),
+  above: LeaderboardEntrySchema.array(),
+  self: LeaderboardEntrySchema.optional(),
+  below: LeaderboardEntrySchema.array(),
 });
 
 export const CockRulerResponseSchema = z.object({
-  leaderboard: LeaderboardEntrySchema.array(),
-  user_position: UserNeighborhoodSchema.optional(),
-  meta: PageMetaSchema.optional(),
+  leaders: LeaderboardEntrySchema.array(),
+  total_participants: z.number(),
+  user_position: z.number(),
+  neighborhood: UserNeighborhoodSchema,
+  page: PageMetaSchema,
 });
 
 export const CockLadderResponseSchema = z.object({
-  ladder: LeaderboardEntrySchema.array(),
-  user_position: UserNeighborhoodSchema.optional(),
-  meta: PageMetaSchema.optional(),
+  leaders: LeaderboardEntrySchema.array(),
+  total_participants: z.number(),
+  user_position: z.number(),
+  neighborhood: UserNeighborhoodSchema,
+  page: PageMetaSchema,
 });
 
 export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>;

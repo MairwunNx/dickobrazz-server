@@ -1,1 +1,3 @@
-// TODO: реализовать бизнес-логику работы с коками в MongoDB
+export const getSeasons = async (): Promise<void> => {
+  // TODO: реализовать бизнес-логику получения сезонов из MongoDB
+};

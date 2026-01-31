@@ -1,7 +1,7 @@
 import type { RequestContext } from "@/cmd/context";
 import { parsePaginationParams } from "@/net/pagination";
 import { successResponse } from "@/net/responses";
-import { getAchievements, getDynamic, getLadder, getOrGenerateSize, getRace, getRuler } from "@/svc/cocks/service";
+import { getAchievements, getDynamic, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
 
 export const cockSizeHandler = async (context: RequestContext): Promise<Response> => {
   if (!context.user) {
@@ -70,5 +70,13 @@ export const cockLadderHandler = async (req: Request, context: RequestContext): 
     user_id: context.user?.id,
   });
 
+  return successResponse(result);
+};
+
+export const cockSeasonsHandler = async (req: Request): Promise<Response> => {
+  const url = new URL(req.url);
+  const pagination = parsePaginationParams(url);
+
+  const result = await getSeasons(pagination);
   return successResponse(result);
 };

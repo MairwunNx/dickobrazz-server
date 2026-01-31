@@ -1,5 +1,13 @@
 import { authLoginHandler } from "@/net/handlers/auth";
-import { cockAchievementsHandler, cockDynamicHandler, cockLadderHandler, cockRaceHandler, cockRulerHandler, cockSizeHandler } from "@/net/handlers/cocks";
+import {
+  cockAchievementsHandler,
+  cockDynamicHandler,
+  cockLadderHandler,
+  cockRaceHandler,
+  cockRulerHandler,
+  cockSeasonsHandler,
+  cockSizeHandler,
+} from "@/net/handlers/cocks";
 import { healthHandler } from "@/net/handlers/health";
 import { meHandler, updatePrivacyHandler } from "@/net/handlers/me";
 import { metricsHandler } from "@/net/handlers/metrics";
@@ -32,6 +40,7 @@ export const routes: Route[] = [
   { method: "GET", path: "/api/v1/cock/dynamic", handler: h(async (_req, ctx) => await cockDynamicHandler(ctx)), protected: true },
   { method: "GET", path: "/api/v1/cock/achievements", handler: h(cockAchievementsHandler), protected: true },
   { method: "GET", path: "/api/v1/cock/ladder", handler: h(cockLadderHandler), protected: true },
+  { method: "GET", path: "/api/v1/cock/seasons", handler: h(cockSeasonsHandler), protected: true },
 ];
 
 export const matchRoute = (method: string, pathname: string): Route | null => {

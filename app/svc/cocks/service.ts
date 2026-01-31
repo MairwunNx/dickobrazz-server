@@ -2,6 +2,7 @@ import type { CockAchievementsResponse } from "@/dto/cock/achievements";
 import type { CockDynamicResponse } from "@/dto/cock/dynamics";
 import type { CockLadderResponse, CockRulerResponse } from "@/dto/cock/leaderboard";
 import type { CockRaceResponse } from "@/dto/cock/race";
+import type { CockSeasonsResponse } from "@/dto/cock/seasons";
 import type { CockSizeResponse } from "@/dto/cock/size";
 import { createTicker, logger } from "@/log";
 import type { GetLeaderboardParams, GetSizeParams, PaginationParams } from "./types";
@@ -184,6 +185,29 @@ export const getLadder = async (params: GetLeaderboardParams): Promise<CockLadde
     service: "cocks",
     operation: "getLadder",
     limit: params.limit,
+    duration_ms: ticker(),
+  });
+
+  return result;
+};
+
+export const getSeasons = async (params: PaginationParams): Promise<CockSeasonsResponse> => {
+  const ticker = createTicker();
+
+  const result: CockSeasonsResponse = {
+    seasons: [],
+    page: {
+      limit: params.limit || 13,
+      total: 0,
+      page: params.page,
+    },
+  };
+
+  logger.info("Get cock seasons (stub)", {
+    service: "cocks",
+    operation: "getSeasons",
+    limit: params.limit,
+    page: params.page,
     duration_ms: ticker(),
   });
 

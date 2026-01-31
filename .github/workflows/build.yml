@@ -1,0 +1,177 @@
+name: 🚀 Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ '.version', 'app/**', 'index.ts', 'package.json', 'bun.lock', 'Dockerfile', 'config.yaml' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ '.version', 'app/**', 'index.ts', 'package.json', 'bun.lock', 'Dockerfile', 'config.yaml' ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: dickobrazz-server
+
+jobs:
+  version-check:
+    name: 🔍 Check Version Changes
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      version-changed: ${{ steps.version-changed.outputs.changed }}
+      should-release: ${{ steps.should-release.outputs.release }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+      - name: Get current version
+        id: version
+        run: |
+          VERSION=$(cat .version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Current version: $VERSION"
+      - name: Check if version changed
+        id: version-changed
+        run: |
+          if git diff HEAD~1 HEAD --name-only | grep -q "^.version$"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "✅ Version file changed"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "❌ Version file not changed"
+          fi
+      - name: Should we release?
+        id: should-release
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" && "${{ steps.version-changed.outputs.changed }}" == "true" ]]; then
+            echo "release=true" >> $GITHUB_OUTPUT
+            echo "🚀 Will create release and push image"
+          else
+            echo "release=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping release (not master or version not changed)"
+          fi
+  checks:
+    name: ✅ Bun Tests and Checks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.8"
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run tests
+        run: bun run test --reporter=junit --reporter-out=reports/junit.xml
+      - name: Run checks
+        run: bun run check
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          path: reports/junit.xml
+  pr-check:
+    name: 🧪 PR Build Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image (PR check)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: dickobrazz-server:pr-${{ github.event.number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build success
+        run: |
+          echo "✅ Docker образ успешно собран для PR #${{ github.event.number }}"
+  build:
+    name: 🔨 Build and Push Docker Image  
+    runs-on: ubuntu-latest
+    needs: version-check
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to Container Registry
+        if: needs.version-check.outputs.should-release == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=true
+            type=raw,value=${{ needs.version-check.outputs.version }},enable=${{ needs.version-check.outputs.version-changed == 'true' }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: ${{ needs.version-check.outputs.should-release == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Image digest
+        if: needs.version-check.outputs.should-release == 'true'
+        run: |
+          echo "📦 Image pushed: ${{ steps.meta.outputs.tags }}"
+  release:
+    name: 📋 Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [version-check, build]
+    if: needs.version-check.outputs.should-release == 'true'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.version-check.outputs.version }}
+          release_name: 🌶️ Dickobrazz Server v${{ needs.version-check.outputs.version }}
+          body: |
+            ## 🚀 Dickobrazz Server v${{ needs.version-check.outputs.version }}
+            
+            ### 📦 Docker Image
+            ```bash
+            docker pull ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ needs.version-check.outputs.version }}
+            docker pull ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            ```
+          draft: false
+          prerelease: false

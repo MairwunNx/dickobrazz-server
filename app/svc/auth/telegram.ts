@@ -15,11 +15,7 @@ export const validateTelegramAuthPayload = (payload: TelegramAuthPayload, botTok
       throw new AuthError("Telegram auth payload expired", "AUTH_EXPIRED");
     }
 
-    const dataCheckParts: string[] = [
-      `auth_date=${payload.auth_date}`,
-      `first_name=${payload.first_name}`,
-      `id=${payload.id}`,
-    ];
+    const dataCheckParts: string[] = [`auth_date=${payload.auth_date}`, `first_name=${payload.first_name}`, `id=${payload.id}`];
 
     if (payload.last_name) dataCheckParts.push(`last_name=${payload.last_name}`);
     if (payload.username) dataCheckParts.push(`username=${payload.username}`);

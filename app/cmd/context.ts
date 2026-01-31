@@ -1,6 +1,6 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import type { UserProfile } from "@/dto/user";
 import type { AuthType } from "@/svc/auth/types";
-import { AsyncLocalStorage } from "node:async_hooks";
 
 export interface RequestContext {
   request_id: string;

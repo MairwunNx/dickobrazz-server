@@ -1,14 +1,19 @@
 import { z } from "zod";
+import { UserProfileSchema } from "./user";
 
 export const TelegramAuthPayloadSchema = z.object({
-  initData: z.string(),
+  id: z.number(),
+  first_name: z.string(),
+  last_name: z.string().optional(),
+  username: z.string().optional(),
+  photo_url: z.string().optional(),
+  auth_date: z.number(),
+  hash: z.string(),
 });
 
 export const AuthResponseSchema = z.object({
-  user_id: z.number(),
-  username: z.string().optional(),
-  is_hidden: z.boolean().default(false),
-  auth_type: z.enum(["telegram", "internal"]),
+  user: UserProfileSchema,
+  session_token: z.string().optional(),
 });
 
 export type TelegramAuthPayload = z.infer<typeof TelegramAuthPayloadSchema>;

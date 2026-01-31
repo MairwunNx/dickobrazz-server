@@ -20,9 +20,9 @@ RUN bun run build
 
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/index.ts .
+COPY --from=prerelease /usr/src/app/dist/index.js ./dist/index.js
 COPY --from=prerelease /usr/src/app/package.json .
 
 USER bun
 EXPOSE 3030/tcp
-ENTRYPOINT [ "bun", "run", "index.ts" ]
+ENTRYPOINT [ "bun", "dist/index.js" ]

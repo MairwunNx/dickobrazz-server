@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["bun", "run", "index.ts"]
     container_name: dickobrazz-server
     cpus: '0.25'
     depends_on: [ dickobrazz-redis, dickobrazz-mongo ]

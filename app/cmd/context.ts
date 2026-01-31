@@ -1,5 +1,6 @@
 import type { UserProfile } from "@/dto/user";
 import type { AuthType } from "@/svc/auth/types";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 export interface RequestContext {
   request_id: string;
@@ -8,16 +9,12 @@ export interface RequestContext {
   is_authenticated: boolean;
 }
 
-let currentContext: RequestContext | null = null;
+export const requestStorage = new AsyncLocalStorage<RequestContext>();
 
-export const setContext = (context: RequestContext): void => {
-  currentContext = context;
+export const withContext = async <T>(context: RequestContext, fn: () => T | Promise<T>): Promise<T> => {
+  return requestStorage.run(context, fn);
 };
 
 export const getContext = (): RequestContext | null => {
-  return currentContext;
-};
-
-export const clearContext = (): void => {
-  currentContext = null;
+  return requestStorage.getStore() ?? null;
 };

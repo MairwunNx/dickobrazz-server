@@ -1,22 +1,9 @@
-import { RedisClient } from "bun";
 import { createTicker, logger } from "@/log";
+import { RedisClient } from "bun";
 
 let client: RedisClient | null = null;
 
-const withRedisPassword = (url: string, password?: string): string => {
-  if (!password) return url;
-
-  try {
-    const parsed = new URL(url);
-    if (parsed.password) return url;
-    parsed.password = password;
-    return parsed.toString();
-  } catch {
-    return url;
-  }
-};
-
-export const connectRedis = async (url: string, password?: string): Promise<RedisClient> => {
+export const connectRedis = async (url: string): Promise<RedisClient> => {
   if (client) return client;
 
   const ticker = createTicker();
@@ -24,8 +11,7 @@ export const connectRedis = async (url: string, password?: string): Promise<Redi
   try {
     logger.info("Connecting to Redis", { service: "redis", operation: "connect" });
 
-    const resolvedUrl = withRedisPassword(url, password);
-    client = new RedisClient(resolvedUrl, { connectionTimeout: 5000 });
+    client = new RedisClient(url, { connectionTimeout: 5000 });
     await client.ping();
 
     logger.info("Redis connected", { service: "redis", operation: "connect", duration_ms: ticker() });

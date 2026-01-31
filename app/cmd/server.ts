@@ -1,5 +1,3 @@
-import type { BunRequest } from "bun";
-import { ZodError } from "zod";
 import { loadConfig } from "@/cfg";
 import { closeMongo, connectMongo } from "@/db/mongo";
 import { closeRedis, connectRedis } from "@/db/redis";
@@ -8,6 +6,8 @@ import { generateRequestId } from "@/net/middlewares/request";
 import { errorResponse } from "@/net/responses";
 import { createIndexes } from "@/rep/mongo";
 import { AppError } from "@/sys/errors";
+import type { BunRequest } from "bun";
+import { ZodError } from "zod";
 import { getCorsHeaders } from "./cors";
 import { routers } from "./router";
 
@@ -17,8 +17,7 @@ export const startServer = async (): Promise<void> => {
   const config = await loadConfig();
 
   await connectMongo(config.svc.db.mongo.url);
-  const redisPassword = config.svc.db.redis.password?.trim() || undefined;
-  await connectRedis(config.svc.db.redis.url, redisPassword);
+  await connectRedis(config.svc.db.redis.url);
   await createIndexes();
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN;

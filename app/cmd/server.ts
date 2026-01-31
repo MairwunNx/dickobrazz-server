@@ -50,7 +50,7 @@ export const startServer = async (): Promise<void> => {
       const ticker = createTicker();
 
       try {
-        await authenticateRequest(req.headers, botToken, config.svc.csot.token, context);
+        await authenticateRequest(req.headers, botToken, config.svc.csot.token, config.svc.auth.session_secret, context);
 
         const route = matchRoute(req.method, url.pathname);
 
@@ -70,7 +70,11 @@ export const startServer = async (): Promise<void> => {
           requireAuth(context);
         }
 
-        const response = await route.handler(req, context, { botToken });
+        const response = await route.handler(req, context, {
+          botToken,
+          sessionSecret: config.svc.auth.session_secret,
+          sessionTtlSec: config.svc.auth.session_ttl_sec,
+        });
 
         logger.info("Request completed", {
           request_id: requestId,

@@ -1,0 +1,62 @@
+{
+  "name": "dickobrazz-server-dev",
+  "dockerComposeFile": [
+    "docker-compose.dev.yml"
+  ],
+  "service": "dickobrazz-server",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "devuser",
+  "forwardPorts": [
+    6379,
+    27017,
+    3030
+  ],
+  "portsAttributes": {
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "notify"
+    },
+    "27017": {
+      "label": "MongoDB",
+      "onAutoForward": "notify"
+    },
+    "3030": {
+      "label": "Dickobrazz Server API",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oven.bun-vscode",
+        "biomejs.biome",
+        "ms-azuretools.vscode-docker",
+        "mongodb.mongodb-vscode",
+        "editorconfig.editorconfig",
+        "redis.redis-for-vscode"
+      ],
+      "settings": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.formatOnSave": true,
+        "files.eol": "\n",
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "editor.defaultFormatter": "biomejs.biome",
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit",
+          "source.fixAll.biome": "explicit"
+        },
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/*/**": true,
+          "**/tmp/**": true
+        }
+      }
+    }
+  },
+  "postCreateCommand": "bun install",
+  "postStartCommand": "bun --version && echo 'NODE_ENV='$NODE_ENV",
+  "shutdownAction": "stopCompose"
+}

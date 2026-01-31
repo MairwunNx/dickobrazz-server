@@ -5,6 +5,7 @@ svc:
       url: "${MONGO_URL}"
     redis:
       url: "${REDIS_URL}"
+      password: "${REDIS_PASSWORD:-}"
   rnd:
     rndorg:
       enabled: true

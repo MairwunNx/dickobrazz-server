@@ -9,6 +9,7 @@ export const ConfigSchema = z.object({
       }),
       redis: z.object({
         url: z.string(),
+        password: z.string().optional(),
       }),
     }),
     rnd: z.object({

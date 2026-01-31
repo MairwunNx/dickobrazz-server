@@ -17,7 +17,8 @@ export const startServer = async (): Promise<void> => {
   const config = await loadConfig();
 
   await connectMongo(config.svc.db.mongo.url);
-  await connectRedis(config.svc.db.redis.url);
+  const redisPassword = config.svc.db.redis.password?.trim() || undefined;
+  await connectRedis(config.svc.db.redis.url, redisPassword);
   await createIndexes();
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN;

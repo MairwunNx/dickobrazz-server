@@ -4,6 +4,8 @@ export {
   CockDynamicDailyDynamicsSchema,
   type CockDynamicFiveCocksDynamics,
   CockDynamicFiveCocksDynamicsSchema,
+  type CockDynamicGlobalResponse,
+  CockDynamicGlobalResponseSchema,
   type CockDynamicIndividual,
   CockDynamicIndividualSchema,
   type CockDynamicOverall,
@@ -16,8 +18,6 @@ export {
   CockDynamicRecordSchema,
   type CockDynamicResponse,
   CockDynamicResponseSchema,
-  type CockDynamicGlobalResponse,
-  CockDynamicGlobalResponseSchema,
 } from "./dynamics";
 export {
   type CockLadderResponse,

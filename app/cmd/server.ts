@@ -1,3 +1,5 @@
+import type { BunRequest } from "bun";
+import { ZodError } from "zod";
 import { loadConfig } from "@/cfg";
 import { closeMongo, connectMongo } from "@/db/mongo";
 import { closeRedis, connectRedis } from "@/db/redis";
@@ -6,8 +8,6 @@ import { generateRequestId } from "@/net/middlewares/request";
 import { errorResponse } from "@/net/responses";
 import { createIndexes } from "@/rep/mongo";
 import { AppError } from "@/sys/errors";
-import type { BunRequest } from "bun";
-import { ZodError } from "zod";
 import { getCorsHeaders } from "./cors";
 import { routers } from "./router";
 

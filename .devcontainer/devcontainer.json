@@ -1,16 +1,10 @@
 {
   "name": "dickobrazz-server-dev",
-  "dockerComposeFile": [
-    "docker-compose.dev.yml"
-  ],
+  "dockerComposeFile": ["docker-compose.dev.yml"],
   "service": "dickobrazz-server",
   "workspaceFolder": "/workspace",
   "remoteUser": "devuser",
-  "forwardPorts": [
-    6379,
-    27017,
-    3030
-  ],
+  "forwardPorts": [6379, 27017, 3030],
   "portsAttributes": {
     "6379": {
       "label": "Redis",
@@ -27,14 +21,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "oven.bun-vscode",
-        "biomejs.biome",
-        "ms-azuretools.vscode-docker",
-        "mongodb.mongodb-vscode",
-        "editorconfig.editorconfig",
-        "redis.redis-for-vscode"
-      ],
+      "extensions": ["oven.bun-vscode", "biomejs.biome", "ms-azuretools.vscode-docker", "mongodb.mongodb-vscode", "editorconfig.editorconfig", "redis.redis-for-vscode"],
       "settings": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true,

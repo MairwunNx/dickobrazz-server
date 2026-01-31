@@ -1,5 +1,5 @@
-import { createTicker, logger } from "@/log";
 import { RedisClient } from "bun";
+import { createTicker, logger } from "@/log";
 
 let client: RedisClient | null = null;
 

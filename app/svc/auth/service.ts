@@ -3,6 +3,9 @@ import type { UserProfile } from "@/dto/user";
 import { createTicker, logger } from "@/log";
 import { AuthError } from "@/sys/errors";
 import { validateTelegramAuthPayload } from "./telegram";
+import { extractBearerToken } from "./bearer";
+import { extractCookieToken } from "./cookie";
+import { verifySessionToken } from "./token";
 import type { AuthResult } from "./types";
 
 export const login = async (payload: TelegramAuthPayload, botToken: string): Promise<AuthResponse> => {
@@ -39,7 +42,12 @@ export const validateInternalToken = (token: string, expectedToken: string): boo
   return isValid;
 };
 
-export const validateRequest = async (headers: Headers, _botToken: string, csotToken: string): Promise<AuthResult> => {
+export const validateRequest = async (
+  headers: Headers,
+  _botToken: string,
+  csotToken: string,
+  sessionSecret: string
+): Promise<AuthResult> => {
   const internalToken = headers.get("x-internal-token");
   if (internalToken) {
     const isValid = validateInternalToken(internalToken, csotToken);
@@ -70,6 +78,25 @@ export const validateRequest = async (headers: Headers, _botToken: string, csotT
     }
 
     throw new AuthError("Invalid internal token", "AUTH_INVALID");
+  }
+
+  const sessionToken = extractBearerToken(headers) || extractCookieToken(headers);
+  if (sessionToken) {
+    const payload = verifySessionToken(sessionToken, sessionSecret);
+    if (payload) {
+      return {
+        authenticated: true,
+        auth_type: "telegram",
+        user: {
+          id: payload.sub,
+          username: undefined,
+          first_name: undefined,
+          last_name: undefined,
+          photo_url: undefined,
+          is_hidden: false,
+        },
+      };
+    }
   }
 
   return { authenticated: false };

@@ -27,6 +27,10 @@ export const ConfigSchema = z.object({
     csot: z.object({
       token: z.string(),
     }),
+    auth: z.object({
+      session_secret: z.string(),
+      session_ttl_sec: z.number().default(604800),
+    }),
   }),
 });
 

@@ -1,4 +1,4 @@
-import { logger } from "@/log";
+import { createTicker, logger } from "@/log";
 import { generateRandomOrgIntegers } from "@/rep/random";
 import { secureRandomInRange } from "./urandom";
 
@@ -13,6 +13,8 @@ export interface RandomConfig {
 }
 
 export const generateRandomInteger = async (config: RandomConfig, min: number, max: number): Promise<number> => {
+  const ticker = createTicker();
+
   if (config.rndorg.enabled && config.rndorg.token) {
     const numbers = await generateRandomOrgIntegers(config.rndorg.token, min, max, 1);
 
@@ -22,6 +24,7 @@ export const generateRandomInteger = async (config: RandomConfig, min: number, m
         operation: "generate",
         source: "random.org",
         value: numbers[0],
+        duration_ms: ticker(),
       });
       return numbers[0] as number;
     }
@@ -29,6 +32,7 @@ export const generateRandomInteger = async (config: RandomConfig, min: number, m
     logger.warn("Random.org failed, falling back to urandom", {
       service: "random",
       operation: "generate",
+      duration_ms: ticker(),
     });
   }
 
@@ -42,6 +46,7 @@ export const generateRandomInteger = async (config: RandomConfig, min: number, m
     operation: "generate",
     source: "urandom",
     value,
+    duration_ms: ticker(),
   });
 
   return value;

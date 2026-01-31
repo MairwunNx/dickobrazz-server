@@ -10,8 +10,8 @@ export const HealthComponentsSchema = z.object({
 export const HealthResponseSchema = z.object({
   status: HealthStatusSchema,
   version: z.string().optional(),
-  uptime: z.number().optional(),
-  components: HealthComponentsSchema.optional(),
+  uptime_sec: z.number().optional(),
+  checks: HealthComponentsSchema.optional(),
 });
 
 export type HealthStatus = z.infer<typeof HealthStatusSchema>;

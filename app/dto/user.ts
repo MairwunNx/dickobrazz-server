@@ -9,4 +9,9 @@ export const UserProfileSchema = z.object({
   is_hidden: z.boolean(),
 });
 
+export const UpdatePrivacyPayloadSchema = z.object({
+  is_hidden: z.boolean(),
+});
+
 export type UserProfile = z.infer<typeof UserProfileSchema>;
+export type UpdatePrivacyPayload = z.infer<typeof UpdatePrivacyPayloadSchema>;

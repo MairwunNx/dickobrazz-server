@@ -1,15 +1,15 @@
+import type { BunRequest } from "bun";
 import { ZodError } from "zod";
 import { loadConfig } from "@/cfg";
 import { closeMongo, connectMongo } from "@/db/mongo";
 import { closeRedis, connectRedis } from "@/db/redis";
 import { createTicker, logger } from "@/log";
-import { authenticateRequest, requireAuth } from "@/net/middlewares/auth";
 import { generateRequestId } from "@/net/middlewares/request";
 import { errorResponse } from "@/net/responses";
 import { createIndexes } from "@/rep/mongo";
 import { AppError } from "@/sys/errors";
-import { clearContext, type RequestContext, setContext } from "./context";
-import { getCorsHeaders, matchRoute } from "./router";
+import { getCorsHeaders } from "./cors";
+import { routers } from "./router";
 
 let serverInstance: ReturnType<typeof Bun.serve> | null = null;
 
@@ -26,12 +26,23 @@ export const startServer = async (): Promise<void> => {
     throw new Error("TELEGRAM_BOT_TOKEN is required");
   }
 
+  const requestTimeoutSec = 10;
+  const setTimeout = (req: BunRequest, timeoutSec: number): void => {
+    serverInstance?.timeout(req, timeoutSec);
+  };
+
   serverInstance = Bun.serve({
     port: config.svc.port,
+    routes: routers({
+      botToken,
+      csotToken: config.svc.csot.token,
+      sessionSecret: config.svc.auth.session_secret,
+      sessionTtlSec: config.svc.auth.session_ttl_sec,
+      timeoutSec: requestTimeoutSec,
+      setTimeout,
+    }),
 
     async fetch(req) {
-      const url = new URL(req.url);
-
       if (req.method === "OPTIONS") {
         return new Response(null, {
           status: 204,
@@ -40,81 +51,26 @@ export const startServer = async (): Promise<void> => {
       }
 
       const requestId = generateRequestId(req.headers);
-      const context: RequestContext = {
-        request_id: requestId,
-        is_authenticated: false,
-      };
-
-      setContext(context);
-
       const ticker = createTicker();
+      const url = new URL(req.url);
 
-      try {
-        await authenticateRequest(req.headers, botToken, config.svc.csot.token, config.svc.auth.session_secret, context);
+      logger.warn("Route not found", {
+        request_id: requestId,
+        service: "server",
+        operation: "route_not_found",
+        method: req.method,
+        path: url.pathname,
+        duration_ms: ticker(),
+      });
 
-        const route = matchRoute(req.method, url.pathname);
-
-        if (!route) {
-          logger.warn("Route not found", {
-            request_id: requestId,
-            service: "server",
-            operation: "route_not_found",
-            method: req.method,
-            path: url.pathname,
-            duration_ms: ticker(),
-          });
-          return errorResponse("Not found", "NOT_FOUND", 404);
-        }
-
-        if (route.protected) {
-          requireAuth(context);
-        }
-
-        const response = await route.handler(req, context, {
-          botToken,
-          sessionSecret: config.svc.auth.session_secret,
-          sessionTtlSec: config.svc.auth.session_ttl_sec,
-        });
-
-        logger.info("Request completed", {
-          request_id: requestId,
-          service: "server",
-          operation: "request",
-          method: req.method,
-          path: url.pathname,
-          status: response.status,
-          user_id: context.user?.id,
-          duration_ms: ticker(),
-        });
-
-        const headers = new Headers(response.headers);
-        const corsHeaders = getCorsHeaders(req.headers.get("origin"));
-        for (const [key, value] of Object.entries(corsHeaders)) {
-          headers.set(key, String(value));
-        }
-        headers.set("X-Request-Id", requestId);
-
-        return new Response(response.body, {
-          status: response.status,
-          headers,
-        });
-      } catch (error) {
-        logger.error("Request failed", {
-          request_id: requestId,
-          service: "server",
-          operation: "request",
-          method: req.method,
-          path: url.pathname,
-          duration_ms: ticker(),
-          error: {
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-          },
-        });
-        throw error;
-      } finally {
-        clearContext();
+      const response = errorResponse("Not found", "NOT_FOUND", 404);
+      const corsHeaders = getCorsHeaders(req.headers.get("origin"));
+      response.headers.set("X-Request-Id", requestId);
+      for (const [key, value] of Object.entries(corsHeaders)) {
+        response.headers.set(key, String(value));
       }
+
+      return response;
     },
 
     error(err: Error) {

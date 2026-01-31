@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: буквальные строки для тестов, так и запланировано.
+
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { parseYamlWithEnv } from "./yaml";
 

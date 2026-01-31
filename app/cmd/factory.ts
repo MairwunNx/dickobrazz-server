@@ -2,7 +2,7 @@ import { createTicker, logger } from "@/log";
 import { authenticateRequest, requireAuth } from "@/net/middlewares/auth";
 import { generateRequestId } from "@/net/middlewares/request";
 import { clearContext, type RequestContext, setContext } from "./context";
-import { getCorsHeaders } from "./router";
+import { getCorsHeaders } from "./cors";
 import type { RouteDeps, RouteHandler, RouteOptions } from "./types";
 
 export const route =

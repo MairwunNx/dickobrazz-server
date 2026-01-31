@@ -1,1 +1,3 @@
-console.log("Hello via Bun!");
+import { startServer } from "./app/cmd/server";
+
+await startServer();

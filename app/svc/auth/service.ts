@@ -1,0 +1,56 @@
+import type { AuthResponse, TelegramAuthPayload } from "@/dto/auth";
+import { createTicker, logger } from "@/log";
+import { AuthError } from "@/sys/errors";
+import { validateTelegramAuthPayload } from "./telegram";
+import type { AuthResult } from "./types";
+
+export const login = async (payload: TelegramAuthPayload, botToken: string): Promise<AuthResponse> => {
+  const ticker = createTicker();
+
+  const user = validateTelegramAuthPayload(payload, botToken);
+
+  // TODO: реализовать бизнес-логику сохранения пользователя в БД
+
+  const result: AuthResponse = {
+    user,
+  };
+
+  logger.info("User logged in", {
+    service: "auth",
+    operation: "login",
+    auth_type: "telegram",
+    user_id: result.user.id,
+    duration_ms: ticker(),
+  });
+
+  return result;
+};
+
+export const validateInternalToken = (token: string, expectedToken: string): boolean => {
+  const isValid = token === expectedToken;
+
+  logger.info("Internal token validation", {
+    service: "auth",
+    operation: "validateInternalToken",
+    valid: isValid,
+  });
+
+  return isValid;
+};
+
+export const validateRequest = async (headers: Headers, botToken: string, csotToken: string): Promise<AuthResult> => {
+  const internalToken = headers.get("x-internal-token");
+  if (internalToken) {
+    const isValid = validateInternalToken(internalToken, csotToken);
+    if (isValid) {
+      return {
+        authenticated: true,
+        auth_type: "internal",
+      };
+    }
+
+    throw new AuthError("Invalid internal token", "AUTH_INVALID");
+  }
+
+  return { authenticated: false };
+};

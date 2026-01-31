@@ -58,7 +58,7 @@ export const check = async (): Promise<HealthResponse> => {
 
   const versionFile = Bun.file(".version");
   const version = (await versionFile.text()).trim();
-  const uptime = Math.floor((Date.now() - startTime) / 1000);
+  const uptimeSec = Math.floor((Date.now() - startTime) / 1000);
   const overallStatus: HealthStatus = mongoStatus === "ok" && redisStatus === "ok" ? "ok" : mongoStatus === "down" || redisStatus === "down" ? "down" : "degraded";
 
   logger.debug("Health check completed", {
@@ -71,8 +71,8 @@ export const check = async (): Promise<HealthResponse> => {
   return {
     status: overallStatus,
     version,
-    uptime,
-    components: {
+    uptime_sec: uptimeSec,
+    checks: {
       mongo: mongoStatus,
       redis: redisStatus,
     },

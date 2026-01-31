@@ -1,10 +1,11 @@
+import type { BunRequest } from "bun";
 import type { AuthResponse, TelegramAuthPayload } from "@/dto/auth";
 import type { UserProfile } from "@/dto/user";
 import { createTicker, logger } from "@/log";
 import { AuthError } from "@/sys/errors";
-import { validateTelegramAuthPayload } from "./telegram";
 import { extractBearerToken } from "./bearer";
 import { extractCookieToken } from "./cookie";
+import { validateTelegramAuthPayload } from "./telegram";
 import { verifySessionToken } from "./token";
 import type { AuthResult } from "./types";
 
@@ -42,17 +43,12 @@ export const validateInternalToken = (token: string, expectedToken: string): boo
   return isValid;
 };
 
-export const validateRequest = async (
-  headers: Headers,
-  _botToken: string,
-  csotToken: string,
-  sessionSecret: string
-): Promise<AuthResult> => {
-  const internalToken = headers.get("x-internal-token");
+export const validateRequest = async (req: BunRequest, _botToken: string, csotToken: string, sessionSecret: string): Promise<AuthResult> => {
+  const internalToken = req.headers.get("x-internal-token");
   if (internalToken) {
     const isValid = validateInternalToken(internalToken, csotToken);
     if (isValid) {
-      const internalUserId = headers.get("x-internal-user-id");
+      const internalUserId = req.headers.get("x-internal-user-id");
       let user: UserProfile | undefined;
       if (internalUserId) {
         const parsed = Number.parseInt(internalUserId, 10);
@@ -80,7 +76,7 @@ export const validateRequest = async (
     throw new AuthError("Invalid internal token", "AUTH_INVALID");
   }
 
-  const sessionToken = extractBearerToken(headers) || extractCookieToken(headers);
+  const sessionToken = extractBearerToken(req.headers) || extractCookieToken(req);
   if (sessionToken) {
     const payload = verifySessionToken(sessionToken, sessionSecret);
     if (payload) {

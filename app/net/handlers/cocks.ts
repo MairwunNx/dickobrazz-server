@@ -1,10 +1,12 @@
-import type { RequestContext } from "@/cmd/context";
+import type { Handler } from "@/cmd/types";
+import { getContext } from "@/cmd/context";
 import { parsePaginationParams } from "@/net/pagination";
 import { successResponse } from "@/net/responses";
 import { getAchievements, getDynamicGlobal, getDynamicPersonal, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
 
-export const cockSizeHandler = async (context: RequestContext): Promise<Response> => {
-  if (!context.user) {
+export const cockSizeHandler: Handler = async () => {
+  const context = getContext();
+  if (!context?.user) {
     throw new Error("User not authenticated");
   }
 
@@ -16,37 +18,40 @@ export const cockSizeHandler = async (context: RequestContext): Promise<Response
   return successResponse(result);
 };
 
-export const cockRulerHandler = async (req: Request, context: RequestContext): Promise<Response> => {
+export const cockRulerHandler: Handler = async (req) => {
+  const context = getContext();
   const url = new URL(req.url);
   const pagination = parsePaginationParams(url);
 
   const result = await getRuler({
     ...pagination,
-    user_id: context.user?.id,
+    user_id: context?.user?.id,
   });
 
   return successResponse(result);
 };
 
-export const cockRaceHandler = async (req: Request, context: RequestContext): Promise<Response> => {
+export const cockRaceHandler: Handler = async (req) => {
+  const context = getContext();
   const url = new URL(req.url);
   const pagination = parsePaginationParams(url);
 
   const result = await getRace({
     ...pagination,
-    user_id: context.user?.id,
+    user_id: context?.user?.id,
   });
 
   return successResponse(result);
 };
 
-export const cockDynamicGlobalHandler = async (): Promise<Response> => {
+export const cockDynamicGlobalHandler: Handler = async () => {
   const result = await getDynamicGlobal();
   return successResponse(result);
 };
 
-export const cockDynamicPersonalHandler = async (context: RequestContext): Promise<Response> => {
-  if (!context.user) {
+export const cockDynamicPersonalHandler: Handler = async () => {
+  const context = getContext();
+  if (!context?.user) {
     throw new Error("User not authenticated");
   }
 
@@ -54,8 +59,9 @@ export const cockDynamicPersonalHandler = async (context: RequestContext): Promi
   return successResponse(result);
 };
 
-export const cockAchievementsHandler = async (req: Request, context: RequestContext): Promise<Response> => {
-  if (!context.user) {
+export const cockAchievementsHandler: Handler = async (req) => {
+  const context = getContext();
+  if (!context?.user) {
     throw new Error("User not authenticated");
   }
 
@@ -66,19 +72,20 @@ export const cockAchievementsHandler = async (req: Request, context: RequestCont
   return successResponse(result);
 };
 
-export const cockLadderHandler = async (req: Request, context: RequestContext): Promise<Response> => {
+export const cockLadderHandler: Handler = async (req) => {
+  const context = getContext();
   const url = new URL(req.url);
   const pagination = parsePaginationParams(url);
 
   const result = await getLadder({
     ...pagination,
-    user_id: context.user?.id,
+    user_id: context?.user?.id,
   });
 
   return successResponse(result);
 };
 
-export const cockSeasonsHandler = async (req: Request): Promise<Response> => {
+export const cockSeasonsHandler: Handler = async (req) => {
   const url = new URL(req.url);
   const pagination = parsePaginationParams(url);
 

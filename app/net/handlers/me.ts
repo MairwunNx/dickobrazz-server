@@ -1,10 +1,12 @@
-import type { RequestContext } from "@/cmd/context";
+import type { Handler } from "@/cmd/types";
+import { getContext } from "@/cmd/context";
 import { UpdatePrivacyPayloadSchema } from "@/dto/user";
 import { errorResponse, successResponse } from "@/net/responses";
 import { getProfile, updatePrivacy } from "@/svc/users/service";
 
-export const meHandler = async (context: RequestContext): Promise<Response> => {
-  if (!context.user) {
+export const meHandler: Handler = async () => {
+  const context = getContext();
+  if (!context?.user) {
     throw new Error("User not authenticated");
   }
 
@@ -12,8 +14,9 @@ export const meHandler = async (context: RequestContext): Promise<Response> => {
   return successResponse(profile);
 };
 
-export const updatePrivacyHandler = async (req: Request, context: RequestContext): Promise<Response> => {
-  if (!context.user) {
+export const updatePrivacyHandler: Handler = async (req) => {
+  const context = getContext();
+  if (!context?.user) {
     throw new Error("User not authenticated");
   }
 

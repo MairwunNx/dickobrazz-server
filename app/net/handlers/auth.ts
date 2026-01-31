@@ -1,29 +1,30 @@
+import type { Handler } from "@/cmd/types";
 import { TelegramAuthPayloadSchema } from "@/dto/auth";
 import { errorResponse } from "@/net/responses";
 import { login } from "@/svc/auth/service";
 import { signSessionToken } from "@/svc/auth/token";
-import { buildSessionCookie } from "./cookie";
+import { setSessionCookie } from "./cookie";
 
-export const authLoginHandler = async (
-  req: Request,
-  botToken: string,
-  sessionSecret: string,
-  sessionTtlSec: number
-): Promise<Response> => {
-  try {
-    const body = await req.json();
-    const parsed = TelegramAuthPayloadSchema.parse(body);
-
-    const authResponse = await login(parsed, botToken);
-    const sessionToken = signSessionToken(authResponse.user.id, sessionSecret, sessionTtlSec);
-    authResponse.session_token = sessionToken;
-
-    const responseBody = { data: authResponse };
-    const headers = new Headers({ "Content-Type": "application/json" });
-    headers.set("Set-Cookie", buildSessionCookie(sessionToken, sessionTtlSec));
-
-    return new Response(JSON.stringify(responseBody), { status: 200, headers });
-  } catch (error) {
-    return errorResponse(error instanceof Error ? error.message : "Login failed", "AUTH_FAILED", 401);
-  }
+type AuthLoginDeps = {
+  botToken: string;
+  sessionSecret: string;
+  sessionTtlSec: number;
 };
+
+export const authLoginHandler =
+  (deps: AuthLoginDeps): Handler =>
+  async (req): Promise<Response> => {
+    try {
+      const body = await req.json();
+      const parsed = TelegramAuthPayloadSchema.parse(body);
+
+      const authResponse = await login(parsed, deps.botToken);
+      const sessionToken = signSessionToken(authResponse.user.id, deps.sessionSecret, deps.sessionTtlSec);
+      authResponse.session_token = sessionToken;
+
+      setSessionCookie(req.cookies, sessionToken, deps.sessionTtlSec);
+      return Response.json({ data: authResponse }, { status: 200 });
+    } catch (error) {
+      return errorResponse(error instanceof Error ? error.message : "Login failed", "AUTH_FAILED", 401);
+    }
+  };

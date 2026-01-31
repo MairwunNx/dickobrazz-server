@@ -3,10 +3,16 @@ import { createTicker, logger } from "@/log";
 import { validateRequest } from "@/svc/auth/service";
 import { AuthError } from "@/sys/errors";
 
-export const authenticateRequest = async (headers: Headers, botToken: string, csotToken: string, context: RequestContext): Promise<void> => {
+export const authenticateRequest = async (
+  headers: Headers,
+  botToken: string,
+  csotToken: string,
+  sessionSecret: string,
+  context: RequestContext
+): Promise<void> => {
   const ticker = createTicker();
 
-  const authResult = await validateRequest(headers, botToken, csotToken);
+  const authResult = await validateRequest(headers, botToken, csotToken, sessionSecret);
 
   context.is_authenticated = authResult.authenticated;
   context.auth_type = authResult.auth_type;

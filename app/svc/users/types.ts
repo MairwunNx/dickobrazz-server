@@ -1,4 +1,4 @@
 export interface UpdatePrivacyParams {
-  user_id: number;
+  id: number;
   is_hidden: boolean;
 }

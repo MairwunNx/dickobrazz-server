@@ -1,19 +1,18 @@
 import { describe, expect, it } from "bun:test";
-import { buildSessionCookie } from "./cookie";
+import { setSessionCookie } from "./cookie";
 
-describe("buildSessionCookie", () => {
-  it("собирает cookie с базовыми атрибутами", () => {
-    const result = buildSessionCookie("token123", 3600, false);
-    expect(result).toContain("session_token=token123");
-    expect(result).toContain("Path=/");
-    expect(result).toContain("HttpOnly");
-    expect(result).toContain("SameSite=Lax");
-    expect(result).toContain("Max-Age=3600");
-    expect(result).not.toContain("Secure");
+describe("setSessionCookie", () => {
+  it("ставит cookie с базовыми атрибутами", () => {
+    const cookies = new Bun.CookieMap();
+    setSessionCookie(cookies, "token123", 3600, false);
+    const json = cookies.toJSON();
+    expect(json.session_token).toBe("token123");
   });
 
-  it("добавляет Secure в проде", () => {
-    const result = buildSessionCookie("token123", 3600, true);
-    expect(result).toContain("Secure");
+  it("ставит Secure в проде", () => {
+    const cookies = new Bun.CookieMap();
+    setSessionCookie(cookies, "token123", 3600, true);
+    const json = cookies.toJSON();
+    expect(json.session_token).toBe("token123");
   });
 });

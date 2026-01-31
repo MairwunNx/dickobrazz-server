@@ -1,15 +1,9 @@
-export const buildSessionCookie = (token: string, ttlSec: number, isProduction = process.env.NODE_ENV === "production"): string => {
-  const parts = [
-    `session_token=${token}`,
-    "Path=/",
-    "HttpOnly",
-    "SameSite=Lax",
-    `Max-Age=${ttlSec}`,
-  ];
-
-  if (isProduction) {
-    parts.push("Secure");
-  }
-
-  return parts.join("; ");
+export const setSessionCookie = (cookies: Bun.CookieMap, token: string, ttlSec: number, isProduction = process.env.NODE_ENV === "production"): void => {
+  cookies.set("session_token", token, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: ttlSec,
+    secure: isProduction,
+  });
 };

@@ -1,6 +1,6 @@
 import { getContext } from "@/cmd/context";
 import type { Handler } from "@/cmd/types";
-import { parsePaginationParams } from "@/net/pagination";
+import { paginationFrom } from "@/net/pagination";
 import { successResponse } from "@/net/responses";
 import { getAchievements, getDynamicGlobal, getDynamicPersonal, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
 
@@ -10,18 +10,13 @@ export const cockSizeHandler: Handler = async () => {
     throw new Error("User not authenticated");
   }
 
-  const result = await getOrGenerateSize({
-    user_id: context.user.id,
-    nickname: context.user.username || `User${context.user.id}`,
-  });
-
+  const result = await getOrGenerateSize({ user_id: context.user.id });
   return successResponse(result);
 };
 
 export const cockRulerHandler: Handler = async (req) => {
   const context = getContext();
-  const url = new URL(req.url);
-  const pagination = parsePaginationParams(url);
+  const pagination = paginationFrom(new URL(req.url));
 
   const result = await getRuler({
     ...pagination,
@@ -33,8 +28,7 @@ export const cockRulerHandler: Handler = async (req) => {
 
 export const cockRaceHandler: Handler = async (req) => {
   const context = getContext();
-  const url = new URL(req.url);
-  const pagination = parsePaginationParams(url);
+  const pagination = paginationFrom(new URL(req.url));
 
   const result = await getRace({
     ...pagination,
@@ -65,17 +59,14 @@ export const cockAchievementsHandler: Handler = async (req) => {
     throw new Error("User not authenticated");
   }
 
-  const url = new URL(req.url);
-  const pagination = parsePaginationParams(url);
-
+  const pagination = paginationFrom(new URL(req.url));
   const result = await getAchievements(context.user.id, pagination);
   return successResponse(result);
 };
 
 export const cockLadderHandler: Handler = async (req) => {
   const context = getContext();
-  const url = new URL(req.url);
-  const pagination = parsePaginationParams(url);
+  const pagination = paginationFrom(new URL(req.url));
 
   const result = await getLadder({
     ...pagination,
@@ -86,9 +77,7 @@ export const cockLadderHandler: Handler = async (req) => {
 };
 
 export const cockSeasonsHandler: Handler = async (req) => {
-  const url = new URL(req.url);
-  const pagination = parsePaginationParams(url);
-
+  const pagination = paginationFrom(new URL(req.url));
   const result = await getSeasons(pagination);
   return successResponse(result);
 };

@@ -1,6 +1,6 @@
 import type { PageMeta } from "@/dto/pagination";
 
-export const parsePaginationParams = (url: URL): { limit?: number; page?: number } => {
+export const paginationFrom = (url: URL): { limit?: number; page?: number } => {
   const limit = url.searchParams.get("limit");
   const page = url.searchParams.get("page");
 

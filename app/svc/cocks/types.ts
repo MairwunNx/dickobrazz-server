@@ -5,7 +5,6 @@ export interface PaginationParams {
 
 export interface GetSizeParams {
   user_id: number;
-  nickname: string;
 }
 
 export interface GetLeaderboardParams extends PaginationParams {

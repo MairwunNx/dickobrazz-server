@@ -13,7 +13,7 @@ export const connectMongo = async (url: string): Promise<Db> => {
     logger.info("Connecting to MongoDB", { service: "mongo", operation: "connect" });
 
     await mongoose.connect(url, {
-      maxPoolSize: 10,
+      maxPoolSize: 127,
       minPoolSize: 2,
       timeoutMS: 1000,
       compressors: "none",

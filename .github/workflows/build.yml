@@ -80,7 +80,7 @@ jobs:
         run: bun run test --reporter=junit --reporter-outfile=reports/junit.xml
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: junit-report
           path: reports/junit.xml

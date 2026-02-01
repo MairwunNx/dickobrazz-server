@@ -15,6 +15,11 @@ export const connectMongo = async (url: string): Promise<Db> => {
     await mongoose.connect(url, {
       maxPoolSize: 10,
       minPoolSize: 2,
+      timeoutMS: 1000,
+      compressors: "none",
+      appName: "dickobrazz-server",
+      retryReads: true,
+      retryWrites: true,
       serverSelectionTimeoutMS: 5000,
     });
 

@@ -5,31 +5,3 @@ Name commits shortly in Russian language.Use emoji before summary of commit whic
 # Communication Rules
 
 Communicate with user in preferly in russian language, but you can thinking in american english. For chatting you can use emoji.
-
-## Tech Stack Rules
-- **Runtime**: Bun (Strictly use native Bun APIs like `Bun.serve`, `Bun.file`, `Bun.password`, `Bun.sql`, `Bun.redis`).
-- **Database**: Mongoose (use latest features).
-- **Cache**: Redis 8.4+ (Use only `Bun.redis` without extra dependencies).
-- **Validation**: Zod (Schema-first approach).
-- **Configuration**: YAML + `.env`.
-
-## Coding Style
-- **No Classes**: Use functional programming, factory functions, and closures.
-- **Succinctness**: Prefer beautiful one-liners and short, focused functions.
-- **Error Handling**: Use the [data, error] tuple pattern (Go-style) instead of try/catch blocks where possible.
-- **Resource Management**: Use the `using` keyword (`Symbol.dispose`) for cleanup-heavy operations.
-- **Naming**: Brief, descriptive, and consistent.
-- **Comments**: Only for non-obvious logic, strictly in Russian. No comments for obvious code.
-- **Native Responses**: Always use `Response.json({ data, meta })` for API responses.
-
-## LLM-Friendly Guidelines
-- Keep files small and modular.
-- Always infer types from Zod schemas: `type T = z.infer<typeof schema>`.
-- Use functional DI (pass dependencies as arguments or via factory functions).
-- Ensure every route/function has a single responsibility.
-
-## Constraints
-- No Axios (use `fetch`).
-- No Jest/Mocha (use `bun:test`).
-- No complex inheritance.
-- Strictly adhere to TypeScript "strict" mode

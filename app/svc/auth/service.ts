@@ -49,6 +49,7 @@ export const validateRequest = async (req: BunRequest, _botToken: string, csotTo
     const isValid = validateInternalToken(internalToken, csotToken);
     if (isValid) {
       const internalUserId = req.headers.get("x-internal-user-id");
+      const internalUserName = req.headers.get("x-internal-user-name");
       let user: UserProfile | undefined;
       if (internalUserId) {
         const parsed = Number.parseInt(internalUserId, 10);
@@ -58,7 +59,7 @@ export const validateRequest = async (req: BunRequest, _botToken: string, csotTo
 
         user = {
           id: parsed,
-          username: undefined,
+          username: internalUserName?.trim() || undefined,
           first_name: undefined,
           last_name: undefined,
           photo_url: undefined,

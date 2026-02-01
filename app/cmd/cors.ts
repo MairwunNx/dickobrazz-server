@@ -10,7 +10,7 @@ export const getCorsHeaders = (origin: string | null): Record<string, string> =>
   return {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Internal-Token, X-Internal-User-Id, X-Request-Id",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Internal-Token, X-Internal-User-Id, X-Internal-User-Name, X-Request-Id",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };

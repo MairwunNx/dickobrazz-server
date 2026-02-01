@@ -13,9 +13,10 @@ const pRulerBase = (startDate: Date, endDate: Date): PipelineStage[] => [
   },
 ];
 
-export const pRulerLeaders = (startDate: Date, endDate: Date, limit = 13): PipelineStage[] => [
+export const pRulerLeaders = (startDate: Date, endDate: Date, limit: number, page: number): PipelineStage[] => [
   ...pRulerBase(startDate, endDate),
   { $sort: { size: -1, requested_at: 1 } },
+  { $skip: Math.max(page - 1, 0) * limit },
   { $limit: limit },
 ];
 

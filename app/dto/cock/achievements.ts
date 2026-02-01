@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { PageMetaSchema } from "../pagination";
 
 export const AchievementSchema = z.object({
   id: z.string(),
@@ -12,7 +11,6 @@ export const AchievementSchema = z.object({
 
 export const CockAchievementsResponseSchema = z.object({
   achievements: AchievementSchema.array(),
-  page: PageMetaSchema,
 });
 
 export type Achievement = z.infer<typeof AchievementSchema>;

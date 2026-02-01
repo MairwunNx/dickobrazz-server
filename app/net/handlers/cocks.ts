@@ -53,14 +53,13 @@ export const cockDynamicPersonalHandler: Handler = async () => {
   return successResponse(result);
 };
 
-export const cockAchievementsHandler: Handler = async (req) => {
+export const cockAchievementsHandler: Handler = async () => {
   const context = getContext();
   if (!context?.user) {
     throw new Error("User not authenticated");
   }
 
-  const pagination = paginationFrom(new URL(req.url));
-  const result = await getAchievements(context.user.id, pagination);
+  const result = await getAchievements(context.user.id);
   return successResponse(result);
 };
 

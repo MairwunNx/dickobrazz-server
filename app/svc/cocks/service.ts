@@ -174,22 +174,17 @@ export const getDynamicPersonal = async (userId: number): Promise<CockDynamicRes
   return result;
 };
 
-export const getAchievements = async (userId: number, params: PaginationParams): Promise<CockAchievementsResponse> => {
+export const getAchievements = async (userId: number): Promise<CockAchievementsResponse> => {
   const ticker = createTicker();
 
   const result = {
     achievements: [],
-    page: {
-      limit: params.limit || 13,
-      total: 0,
-    },
   };
 
   logger.info("Get achievements (stub)", {
     service: "cocks",
     operation: "getAchievements",
     user_id: userId,
-    limit: params.limit,
     duration_ms: ticker(),
   });
 

@@ -48,8 +48,4 @@ export const pAllUsersInSeason = (startDate: Date, endDate: Date): PipelineStage
   { $sort: { total_size: -1 } },
 ];
 
-export const pFirstCockDate = (): PipelineStage[] => [
-  { $sort: { requested_at: 1 } },
-  { $limit: 1 },
-  { $project: { _id: 0, first_date: "$requested_at" } },
-];
+export const pFirstCockDate = (): PipelineStage[] => [{ $sort: { requested_at: 1 } }, { $limit: 1 }, { $project: { _id: 0, first_date: "$requested_at" } }];

@@ -19,10 +19,7 @@ export const pRulerLeaders = (startDate: Date, endDate: Date, limit = 13): Pipel
   { $limit: limit },
 ];
 
-export const pRulerParticipants = (startDate: Date, endDate: Date): PipelineStage[] => [
-  ...pRulerBase(startDate, endDate),
-  { $count: "total" },
-];
+export const pRulerParticipants = (startDate: Date, endDate: Date): PipelineStage[] => [...pRulerBase(startDate, endDate), { $count: "total" }];
 
 export const pRulerUserPosition = (userId: number, startDate: Date, endDate: Date): PipelineStage[] => [
   ...pRulerBase(startDate, endDate),
@@ -36,10 +33,5 @@ export const pRulerUserPosition = (userId: number, startDate: Date, endDate: Dat
 export const pRulerNeighborhood = (position: number, startDate: Date, endDate: Date): PipelineStage[] => {
   const skip = Math.max(position - 2, 0);
 
-  return [
-    ...pRulerBase(startDate, endDate),
-    { $sort: { size: -1, requested_at: 1 } },
-    { $skip: skip },
-    { $limit: 3 },
-  ];
+  return [...pRulerBase(startDate, endDate), { $sort: { size: -1, requested_at: 1 } }, { $skip: skip }, { $limit: 3 }];
 };

@@ -23,10 +23,7 @@ export const pIrk = (userId: number): PipelineStage[] => [
               { $lte: ["$global_data.global_total_size", 0] },
               0,
               {
-                $divide: [
-                  { $log10: { $add: [1, "$user_total_size"] } },
-                  { $log10: { $add: [1, "$global_data.global_total_size"] } },
-                ],
+                $divide: [{ $log10: { $add: [1, "$user_total_size"] } }, { $log10: { $add: [1, "$global_data.global_total_size"] } }],
               },
             ],
           },
@@ -96,10 +93,7 @@ export const pDailyDynamics = (userId: number): PipelineStage[] => [
           {
             $multiply: [
               {
-                $divide: [
-                  { $subtract: ["$curr_cock", "$prev_cock"] },
-                  { $max: ["$prev_cock", 1] },
-                ],
+                $divide: [{ $subtract: ["$curr_cock", "$prev_cock"] }, { $max: ["$prev_cock", 1] }],
               },
               100,
             ],
@@ -125,9 +119,7 @@ export const pUserRecent = (userId: number): PipelineStage[] => [
   { $project: { _id: 0, average: { $round: ["$avg_val", 0] } } },
 ];
 
-export const pOverallTotal = (): PipelineStage[] => [
-  { $group: { _id: null, size: { $sum: "$size" } } },
-];
+export const pOverallTotal = (): PipelineStage[] => [{ $group: { _id: null, size: { $sum: "$size" } } }];
 
 export const pOverallRecent = (): PipelineStage[] => [
   {
@@ -156,10 +148,7 @@ export const pOverallRecent = (): PipelineStage[] => [
   { $project: { _id: 0, median: 1, average: { $round: ["$average", 0] } } },
 ];
 
-export const pUniqueUsers = (): PipelineStage[] => [
-  { $group: { _id: "$user_id" } },
-  { $count: "count" },
-];
+export const pUniqueUsers = (): PipelineStage[] => [{ $group: { _id: "$user_id" } }, { $count: "count" }];
 
 export const pDistribution = (): PipelineStage[] => [
   {
@@ -190,18 +179,10 @@ export const pDistribution = (): PipelineStage[] => [
     $project: {
       _id: 0,
       huge: {
-        $cond: [
-          { $eq: ["$total", 0] },
-          0,
-          { $multiply: [{ $divide: ["$huge", "$total"] }, 100] },
-        ],
+        $cond: [{ $eq: ["$total", 0] }, 0, { $multiply: [{ $divide: ["$huge", "$total"] }, 100] }],
       },
       little: {
-        $cond: [
-          { $eq: ["$total", 0] },
-          0,
-          { $multiply: [{ $divide: ["$little", "$total"] }, 100] },
-        ],
+        $cond: [{ $eq: ["$total", 0] }, 0, { $multiply: [{ $divide: ["$little", "$total"] }, 100] }],
       },
     },
   },
@@ -228,11 +209,7 @@ export const pOverallGrowthSpeed = (): PipelineStage[] => [
       growth_speed: {
         $round: [
           {
-            $cond: [
-              { $gt: ["$count", 0] },
-              { $divide: [{ $sum: "$daily_totals" }, "$count"] },
-              0,
-            ],
+            $cond: [{ $gt: ["$count", 0] }, { $divide: [{ $sum: "$daily_totals" }, "$count"] }, 0],
           },
           1,
         ],
@@ -264,14 +241,9 @@ export const pUserRecord = (userId: number): PipelineStage[] => [
   { $project: { _id: 0, requested_at: 1, total: "$size" } },
 ];
 
-export const pTotalCocksCount = (): PipelineStage[] => [
-  { $count: "total_count" },
-];
+export const pTotalCocksCount = (): PipelineStage[] => [{ $count: "total_count" }];
 
-export const pUserCocksCount = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $count: "user_count" },
-];
+export const pUserCocksCount = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $count: "user_count" }];
 
 export const pLuck = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
@@ -358,11 +330,7 @@ export const pUserGrowthSpeed = (userId: number): PipelineStage[] => [
       growth_speed: {
         $round: [
           {
-            $cond: [
-              { $gt: ["$count", 0] },
-              { $divide: [{ $sum: "$daily_sizes" }, "$count"] },
-              0,
-            ],
+            $cond: [{ $gt: ["$count", 0] }, { $divide: [{ $sum: "$daily_sizes" }, "$count"] }, 0],
           },
           1,
         ],

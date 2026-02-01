@@ -6,10 +6,7 @@ export const pTopUsersBySize = (limit = 13): PipelineStage[] => [
   { $limit: limit },
 ];
 
-export const pTotalCockersCount = (): PipelineStage[] => [
-  { $group: { _id: "$user_id" } },
-  { $count: "total" },
-];
+export const pTotalCockersCount = (): PipelineStage[] => [{ $group: { _id: "$user_id" } }, { $count: "total" }];
 
 export const pUserPositionInLadder = (userId: number): PipelineStage[] => [
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
@@ -23,16 +20,10 @@ export const pUserPositionInLadder = (userId: number): PipelineStage[] => [
 export const pNeighborhoodInLadder = (position: number): PipelineStage[] => {
   const skip = Math.max(position - 2, 0);
 
-  return [
-    { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
-    { $sort: { total_size: -1 } },
-    { $skip: skip },
-    { $limit: 3 },
-  ];
+  return [{ $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } }, { $sort: { total_size: -1 } }, { $skip: skip }, { $limit: 3 }];
 };
 
 export const pUserTotalSize = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
   { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
 ];
-

@@ -1,10 +1,6 @@
 import type { PipelineStage } from "mongoose";
 
-export const pActiveUsersSince = (since: Date): PipelineStage[] => [
-  { $match: { requested_at: { $gte: since } } },
-  { $group: { _id: "$user_id" } },
-  { $count: "total" },
-];
+export const pActiveUsersSince = (since: Date): PipelineStage[] => [{ $match: { requested_at: { $gte: since } } }, { $group: { _id: "$user_id" } }, { $count: "total" }];
 
 export const pSizeDistribution = (): PipelineStage[] => [
   {

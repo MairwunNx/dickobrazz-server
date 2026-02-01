@@ -2,30 +2,15 @@ import type { PipelineStage } from "mongoose";
 
 const tz = "Europe/Moscow";
 
-export const pAchTotalPulls = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $count: "count" },
-];
+export const pAchTotalPulls = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $count: "count" }];
 
-export const pAchTotalSize = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $group: { _id: null, total: { $sum: "$size" } } },
-];
+export const pAchTotalSize = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $group: { _id: null, total: { $sum: "$size" } } }];
 
-export const pAchSniper30cm = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId, size: 30 } },
-  { $count: "count" },
-];
+export const pAchSniper30cm = (userId: number): PipelineStage[] => [{ $match: { user_id: userId, size: 30 } }, { $count: "count" }];
 
-export const pAchHalfHundred50cm = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId, size: 50 } },
-  { $count: "count" },
-];
+export const pAchHalfHundred50cm = (userId: number): PipelineStage[] => [{ $match: { user_id: userId, size: 50 } }, { $count: "count" }];
 
-export const pAchMaximalist61cm = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId, size: 61 } },
-  { $count: "count" },
-];
+export const pAchMaximalist61cm = (userId: number): PipelineStage[] => [{ $match: { user_id: userId, size: 61 } }, { $count: "count" }];
 
 export const pAchBeautifulNumbers = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId, size: { $in: [11, 22, 33, 44, 55] } } },
@@ -33,22 +18,11 @@ export const pAchBeautifulNumbers = (userId: number): PipelineStage[] => [
   { $count: "count" },
 ];
 
-export const pAchRecent10 = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $sort: { requested_at: -1 } },
-  { $limit: 10 },
-  { $sort: { requested_at: 1 } },
-];
+export const pAchRecent10 = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $sort: { requested_at: -1 } }, { $limit: 10 }, { $sort: { requested_at: 1 } }];
 
-export const pAchMaxSize = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $group: { _id: null, max: { $max: "$size" } } },
-];
+export const pAchMaxSize = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $group: { _id: null, max: { $max: "$size" } } }];
 
-export const pAchMinSize = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $group: { _id: null, min: { $min: "$size" } } },
-];
+export const pAchMinSize = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $group: { _id: null, min: { $min: "$size" } } }];
 
 export const pAchEarlyBird = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
@@ -155,22 +129,11 @@ export const pAchLightning = (userId: number): PipelineStage[] => [
   { $count: "count" },
 ];
 
-export const pAchLast31 = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $sort: { requested_at: -1 } },
-  { $limit: 31 },
-];
+export const pAchLast31 = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $sort: { requested_at: -1 } }, { $limit: 31 }];
 
-export const pAchRecent3 = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $sort: { requested_at: -1 } },
-  { $limit: 3 },
-  { $sort: { requested_at: 1 } },
-];
+export const pAchRecent3 = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $sort: { requested_at: -1 } }, { $limit: 3 }, { $sort: { requested_at: 1 } }];
 
-export const pGlobalMaxMin = (): PipelineStage[] => [
-  { $group: { _id: null, max: { $max: "$size" }, min: { $min: "$size" } } },
-];
+export const pGlobalMaxMin = (): PipelineStage[] => [{ $group: { _id: null, max: { $max: "$size" }, min: { $min: "$size" } } }];
 
 export const pCountSeasons = (userId: number): PipelineStage[] => [
   { $group: { _id: null, first_cock_date: { $min: "$requested_at" } } },
@@ -192,10 +155,7 @@ export const pCountSeasons = (userId: number): PipelineStage[] => [
         {
           $project: {
             months_diff: {
-              $subtract: [
-                { $add: [{ $multiply: ["$year", 12] }, "$month"] },
-                { $add: [{ $multiply: ["$first_year", 12] }, "$first_month"] },
-              ],
+              $subtract: [{ $add: [{ $multiply: ["$year", 12] }, "$month"] }, { $add: [{ $multiply: ["$first_year", 12] }, "$first_month"] }],
             },
           },
         },
@@ -209,11 +169,7 @@ export const pCountSeasons = (userId: number): PipelineStage[] => [
   { $count: "count" },
 ];
 
-export const pCheckTraveler = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $group: { _id: "$size" } },
-  { $count: "unique_sizes" },
-];
+export const pCheckTraveler = (userId: number): PipelineStage[] => [{ $match: { user_id: userId } }, { $group: { _id: "$size" } }, { $count: "unique_sizes" }];
 
 export const pCheckMuscovite = (userId: number, startDate: Date): PipelineStage[] => [
   { $match: { user_id: userId, size: 50, requested_at: { $gte: startDate } } },

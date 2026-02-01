@@ -1,9 +1,10 @@
 import type { PipelineStage } from "mongoose";
 
-export const pRaceLeaders = (startDate: Date, endDate: Date, limit = 13): PipelineStage[] => [
+export const pRaceLeaders = (startDate: Date, endDate: Date, limit: number, page: number): PipelineStage[] => [
   { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
   { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
   { $sort: { total_size: -1 } },
+  { $skip: Math.max(page - 1, 0) * limit },
   { $limit: limit },
 ];
 

@@ -1,8 +1,9 @@
 import type { PipelineStage } from "mongoose";
 
-export const pTopUsersBySize = (limit = 13): PipelineStage[] => [
+export const pTopUsersBySize = (limit: number, page: number): PipelineStage[] => [
   { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
   { $sort: { total_size: -1 } },
+  { $skip: Math.max(page - 1, 0) * limit },
   { $limit: limit },
 ];
 

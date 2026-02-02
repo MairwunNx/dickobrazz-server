@@ -1,22 +1,14 @@
+import { getConfig } from "@/cfg";
 import { createTicker, logger } from "@/log";
 import { generateRandomOrgIntegers } from "@/rep/random";
 import { secureRandomInRange } from "./urandom";
 
-export interface RandomConfig {
-  rndorg: {
-    enabled: boolean;
-    token?: string;
-  };
-  urandom: {
-    enabled: boolean;
-  };
-}
-
-export const generateRandomInteger = async (config: RandomConfig, min: number, max: number): Promise<number> => {
+export const generateRandomInteger = async (min: number, max: number): Promise<number> => {
   const ticker = createTicker();
+  const config = getConfig().svc.rnd;
 
   if (config.rndorg.enabled && config.rndorg.token) {
-    const numbers = await generateRandomOrgIntegers(config.rndorg.token, min, max, 1);
+    const numbers = await generateRandomOrgIntegers(min, max, 1);
 
     if (numbers && numbers.length > 0) {
       logger.info("Random integer generated via Random.org", {

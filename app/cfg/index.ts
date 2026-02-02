@@ -1,7 +1,7 @@
 import { createTicker, logger } from "@/log";
 import { once } from "@/snc/once";
 import { loadEnv } from "./env";
-import { type AppConfig, ConfigSchema } from "./schm";
+import { type AppConfig, ConfigSchema } from "./schema";
 import { expand } from "./yaml";
 
 export const config = once(

@@ -1,8 +1,8 @@
 import type { Handler } from "@/cmd/types";
-import { successResponse } from "@/net/responses";
+import { success } from "@/net/responses";
 import { check } from "@/svc/health/service";
 
-export const healthHandler: Handler = async () => {
+export const health: Handler = async () => {
   const health = await check();
-  return successResponse(health, health.status === "ok" ? 200 : 503);
+  return success(health, health.status === "ok" ? 200 : 503);
 };

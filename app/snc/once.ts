@@ -3,25 +3,19 @@ type OnceOptions = {
   cachePromise?: boolean;
 };
 
-type OnceFn<F extends (...args: unknown[]) => unknown> = ((
-  ...args: Parameters<F>
-) => ReturnType<F>) & {
+type OnceFn<A extends unknown[], R> = ((...args: A) => R) & {
   reset: () => void;
   called: () => boolean;
 };
 
-const isPromise = <T>(value: T | Promise<T>): value is Promise<T> =>
-  typeof (value as { then?: unknown })?.then === "function";
+const isPromise = <T>(value: T | Promise<T>): value is Promise<T> => typeof (value as { then?: unknown })?.then === "function";
 
-const once = <F extends (...args: unknown[]) => unknown>(
-  fn: F,
-  options: OnceOptions = {},
-): OnceFn<F> => {
+const once = <A extends unknown[], R>(fn: (...args: A) => R, options: OnceOptions = {}): OnceFn<A, R> => {
   let called = false;
-  let value = undefined as ReturnType<F>;
+  let value = undefined as R;
   let error: unknown;
 
-  const wrapped = (...args: Parameters<F>): ReturnType<F> => {
+  const wrapped = (...args: A): R => {
     if (called) {
       if (error) throw error;
       return value;
@@ -30,7 +24,7 @@ const once = <F extends (...args: unknown[]) => unknown>(
     try {
       const result = fn(...args);
 
-      value = result as ReturnType<F>;
+      value = result as R;
       called = true;
 
       if (options.cachePromise && isPromise(result)) {
@@ -40,7 +34,7 @@ const once = <F extends (...args: unknown[]) => unknown>(
             return;
           }
           called = false;
-          value = undefined as ReturnType<F>;
+          value = undefined as R;
         });
       }
 
@@ -57,7 +51,7 @@ const once = <F extends (...args: unknown[]) => unknown>(
   return Object.assign(wrapped, {
     reset() {
       called = false;
-      value = undefined as ReturnType<F>;
+      value = undefined as R;
       error = undefined;
     },
     called() {

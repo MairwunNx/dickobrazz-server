@@ -16,8 +16,8 @@ let server: ReturnType<typeof Bun.serve> | null = null;
 export const startServer = async (): Promise<void> => {
   const cfg = await config();
 
-  await mongo(cfg.svc.db.mongo.url);
-  await redis(cfg.svc.db.redis.url);
+  await mongo();
+  await redis();
   await index();
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN;

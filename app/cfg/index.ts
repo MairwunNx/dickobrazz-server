@@ -2,18 +2,14 @@ import { createTicker, logger } from "@/log";
 import { once } from "@/snc/once";
 import { loadEnv } from "./env";
 import { type AppConfig, ConfigSchema } from "./schm";
-import { parseYamlWithEnv } from "./yaml";
+import { expand } from "./yaml";
 
 export const config = once(
   async (): Promise<AppConfig> => {
     const ticker = createTicker();
     loadEnv();
 
-    const file = Bun.file("config.yaml");
-    const text = await file.text();
-
-    const parsed = parseYamlWithEnv(text);
-    const cfg = ConfigSchema.parse(parsed);
+    const cfg = ConfigSchema.parse(expand(await Bun.file("config.yaml").text()));
 
     logger.info("Configuration loaded", {
       service: "config",

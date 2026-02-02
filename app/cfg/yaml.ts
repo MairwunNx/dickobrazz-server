@@ -1,6 +1,6 @@
 import YAML from "yaml";
 
-export const parseYamlWithEnv = (text: string): unknown => {
+export const expand = (text: string): unknown => {
   const expandedText = text.replace(/\$\{([A-Z0-9_]+)(?::-(.*?))?\}/gi, (_match, varName: string, fallback?: string) => {
     const value = process.env[varName];
     if (value !== undefined) return value;

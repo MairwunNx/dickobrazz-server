@@ -1,26 +1,22 @@
-import { RandomOrgClient, RandomOrgRANDOMORGError } from "@randomorg/core";
+import RandomOrg from "random-org";
+import { getConfig } from "@/cfg";
 import { logger } from "@/log";
 
-const clientCache = new Map<string, RandomOrgClient>();
+let activeClient: RandomOrg | null = null;
 
-const getClient = (apiKey: string): RandomOrgClient => {
-  const cached = clientCache.get(apiKey);
-  if (cached) return cached;
-
-  const client = new RandomOrgClient(apiKey, { httpTimeout: 2000 });
-  clientCache.set(apiKey, client);
-  return client;
-};
-
-export const generateRandomOrgIntegers = async (apiKey: string, min: number, max: number, count = 1): Promise<number[] | null> => {
+export const generateRandomOrgIntegers = async (min: number, max: number, count = 1): Promise<number[] | null> => {
   const startTime = Date.now();
-  const client = getClient(apiKey);
+  if (!activeClient) {
+    activeClient = new RandomOrg({ apiKey: getConfig().svc.rnd.rndorg.token ?? "похуй" });
+  }
+  const client = activeClient;
 
   try {
-    const numbers = await client.generateIntegers(count, min, max);
-    const numbers0 = numbers.map((val) => (typeof val === "number" ? val : parseInt(String(val), 10)));
+    const response = await client.generateIntegers({ n: count, min, max });
+    const rawNumbers = response?.random?.data;
+    const numbers0 = Array.isArray(rawNumbers) ? rawNumbers.map((val) => (typeof val === "number" ? val : parseInt(String(val), 10))) : null;
 
-    if (!numbers || !Array.isArray(numbers)) {
+    if (!numbers0) {
       logger.warn("Random.org API returned invalid data", {
         service: "random.org",
         operation: "generateIntegers",
@@ -43,13 +39,13 @@ export const generateRandomOrgIntegers = async (apiKey: string, min: number, max
 
     return numbers0;
   } catch (error) {
-    const isRandomOrgError = error instanceof RandomOrgRANDOMORGError;
+    const errorCode = error && typeof error === "object" && "code" in error ? String((error as { code: unknown }).code) : "unknown";
     logger.warn("Random.org API request failed", {
       service: "random.org",
       operation: "generateIntegers",
       error: {
         message: error instanceof Error ? error.message : String(error),
-        code: isRandomOrgError ? "randomorg" : "unknown",
+        code: errorCode,
       },
       duration_ms: Date.now() - startTime,
     });

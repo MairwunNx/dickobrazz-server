@@ -1,53 +1,39 @@
 import RandomOrg from "random-org";
 import { getConfig } from "@/cfg";
 import { logger } from "@/log";
+import { createTicker } from "@/log/timing";
+import { once } from "@/snc/once";
 
-let activeClient: RandomOrg | null = null;
+const client = once(() => new RandomOrg({ apiKey: getConfig().svc.rnd.rndorg.token ?? "похуй" }));
 
-export const generateRandomOrgIntegers = async (min: number, max: number, count = 1): Promise<number[] | null> => {
-  const startTime = Date.now();
-  if (!activeClient) {
-    activeClient = new RandomOrg({ apiKey: getConfig().svc.rnd.rndorg.token ?? "похуй" });
-  }
-  const client = activeClient;
+export const trng = async (min: number, max: number): Promise<number | null> => {
+  const ticker = createTicker();
+  const instance = client();
 
   try {
-    const response = await client.generateIntegers({ n: count, min, max });
-    const rawNumbers = response?.random?.data;
-    const numbers0 = Array.isArray(rawNumbers) ? rawNumbers.map((val) => (typeof val === "number" ? val : parseInt(String(val), 10))) : null;
-
-    if (!numbers0) {
-      logger.warn("Random.org API returned invalid data", {
-        service: "random.org",
-        operation: "generateIntegers",
-        duration_ms: Date.now() - startTime,
-      });
-      return null;
-    }
-
-    if (numbers0.some(Number.isNaN)) {
-      logger.error("Random.org API returned non-numeric strings");
-      return null;
-    }
+    const response = await instance.generateIntegers({ n: 1, min, max });
+    const numbers = response.random.data;
+    const value = numbers[0] ?? null;
 
     logger.debug("Random.org integers generated", {
       service: "random.org",
-      operation: "generateIntegers",
-      count: numbers0.length,
-      duration_ms: Date.now() - startTime,
+      operation: "trng",
+      value,
+      duration_ms: ticker(),
     });
 
-    return numbers0;
+    return value;
   } catch (error) {
-    const errorCode = error && typeof error === "object" && "code" in error ? String((error as { code: unknown }).code) : "unknown";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorCode = error && typeof error === "object" && "code" in error ? String((error as { code?: unknown }).code ?? "N/A") : "N/A";
     logger.warn("Random.org API request failed", {
       service: "random.org",
-      operation: "generateIntegers",
+      operation: "trng",
       error: {
-        message: error instanceof Error ? error.message : String(error),
+        message: errorMessage,
         code: errorCode,
       },
-      duration_ms: Date.now() - startTime,
+      duration_ms: ticker(),
     });
 
     return null;

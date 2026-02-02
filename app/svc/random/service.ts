@@ -3,7 +3,7 @@ import { createTicker, logger } from "@/log";
 import { trng } from "@/rep/random";
 import { urandom } from "./urandom";
 
-export const generateRandomInteger = async (min: number, max: number): Promise<number> => {
+export const rndint = async (min: number, max: number): Promise<number> => {
   const ticker = createTicker();
   const config = getConfig().svc.rnd;
 

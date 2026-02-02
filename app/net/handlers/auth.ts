@@ -1,6 +1,6 @@
 import type { Handler } from "@/cmd/types";
 import { TelegramAuthPayloadSchema } from "@/dto/auth";
-import { errorResponse } from "@/net/responses";
+import { failure } from "@/net/responses";
 import { login } from "@/svc/auth/service";
 import { signSessionToken } from "@/svc/auth/token";
 import { setSessionCookie } from "./cookie";
@@ -11,7 +11,7 @@ type AuthLoginDeps = {
   sessionTtlSec: number;
 };
 
-export const authLoginHandler =
+export const auth =
   (deps: AuthLoginDeps): Handler =>
   async (req): Promise<Response> => {
     try {
@@ -25,6 +25,6 @@ export const authLoginHandler =
       setSessionCookie(req.cookies, sessionToken, deps.sessionTtlSec);
       return Response.json({ data: authResponse }, { status: 200 });
     } catch (error) {
-      return errorResponse(error instanceof Error ? error.message : "Login failed", "AUTH_FAILED", 401);
+      return failure(error instanceof Error ? error.message : "Login failed", "AUTH_FAILED", 401);
     }
   };

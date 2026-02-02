@@ -1,8 +1,8 @@
+import type { BunRequest } from "bun";
 import type { Handler } from "@/cmd/types";
 import { paginationFrom } from "@/net/pagination";
 import { success } from "@/net/responses";
 import { getAchievements, getDynamicGlobal, getDynamicPersonal, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
-import type { BunRequest } from "bun";
 
 const page: (req: BunRequest) => { limit?: number; page?: number } = (req) => paginationFrom(new URL(req.url));
 export const size: Handler = async () => success(await getOrGenerateSize());

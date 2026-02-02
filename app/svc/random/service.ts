@@ -1,13 +1,13 @@
-import { getConfig } from "@/cfg";
+import { config } from "@/cfg";
 import { createTicker, logger } from "@/log";
 import { trng } from "@/rep/random";
 import { urandom } from "./urandom";
 
 export const rndint = async (min: number, max: number): Promise<number> => {
   const ticker = createTicker();
-  const config = getConfig().svc.rnd;
+  const cfg = (await config()).svc.rnd;
 
-  if (config.rndorg.enabled && config.rndorg.token) {
+  if (cfg.rndorg.enabled && cfg.rndorg.token) {
     const value = await trng(min, max);
 
     if (value !== null) {
@@ -28,7 +28,7 @@ export const rndint = async (min: number, max: number): Promise<number> => {
     });
   }
 
-  if (!config.urandom.enabled) {
+  if (!cfg.urandom.enabled) {
     throw new Error("All random sources are disabled");
   }
 

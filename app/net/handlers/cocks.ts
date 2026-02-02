@@ -1,82 +1,15 @@
-import { getContext } from "@/cmd/context";
 import type { Handler } from "@/cmd/types";
 import { paginationFrom } from "@/net/pagination";
-import { successResponse } from "@/net/responses";
+import { success } from "@/net/responses";
 import { getAchievements, getDynamicGlobal, getDynamicPersonal, getLadder, getOrGenerateSize, getRace, getRuler, getSeasons } from "@/svc/cocks/service";
+import type { BunRequest } from "bun";
 
-export const cockSizeHandler: Handler = async () => {
-  const context = getContext();
-  if (!context?.user) {
-    throw new Error("User not authenticated");
-  }
-
-  const result = await getOrGenerateSize({ user_id: context.user.id });
-  return successResponse(result);
-};
-
-export const cockRulerHandler: Handler = async (req) => {
-  const context = getContext();
-  const pagination = paginationFrom(new URL(req.url));
-
-  const result = await getRuler({
-    ...pagination,
-    user_id: context?.user?.id,
-  });
-
-  return successResponse(result);
-};
-
-export const cockRaceHandler: Handler = async (req) => {
-  const context = getContext();
-  const pagination = paginationFrom(new URL(req.url));
-
-  const result = await getRace({
-    ...pagination,
-    user_id: context?.user?.id,
-  });
-
-  return successResponse(result);
-};
-
-export const cockDynamicGlobalHandler: Handler = async () => {
-  const result = await getDynamicGlobal();
-  return successResponse(result);
-};
-
-export const cockDynamicPersonalHandler: Handler = async () => {
-  const context = getContext();
-  if (!context?.user) {
-    throw new Error("User not authenticated");
-  }
-
-  const result = await getDynamicPersonal(context.user.id);
-  return successResponse(result);
-};
-
-export const cockAchievementsHandler: Handler = async () => {
-  const context = getContext();
-  if (!context?.user) {
-    throw new Error("User not authenticated");
-  }
-
-  const result = await getAchievements(context.user.id);
-  return successResponse(result);
-};
-
-export const cockLadderHandler: Handler = async (req) => {
-  const context = getContext();
-  const pagination = paginationFrom(new URL(req.url));
-
-  const result = await getLadder({
-    ...pagination,
-    user_id: context?.user?.id,
-  });
-
-  return successResponse(result);
-};
-
-export const cockSeasonsHandler: Handler = async (req) => {
-  const pagination = paginationFrom(new URL(req.url));
-  const result = await getSeasons(pagination);
-  return successResponse(result);
-};
+const page: (req: BunRequest) => { limit?: number; page?: number } = (req) => paginationFrom(new URL(req.url));
+export const size: Handler = async () => success(await getOrGenerateSize());
+export const ruler: Handler = async (req) => success(await getRuler(page(req)));
+export const race: Handler = async (req) => success(await getRace(page(req)));
+export const dynamicg: Handler = async () => success(await getDynamicGlobal());
+export const dynamicp: Handler = async () => success(await getDynamicPersonal());
+export const achievements: Handler = async (req) => success(await getAchievements(page(req)));
+export const ladder: Handler = async (req) => success(await getLadder(page(req)));
+export const seasons: Handler = async (req) => success(await getSeasons(page(req)));

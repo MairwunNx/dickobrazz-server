@@ -18,7 +18,7 @@ export const CockRaceResponseSchema = z.object({
   season: SeasonInfoSchema.optional(),
   leaders: RaceEntrySchema.array(),
   total_participants: z.number(),
-  user_position: z.number(),
+  user_position: z.number().nullable().optional(),
   neighborhood: RaceNeighborhoodSchema,
   page: PageMetaSchema,
 });

@@ -1,43 +1,43 @@
-import type { BunRequest } from "bun";
-import { ZodError } from "zod";
-import { loadConfig } from "@/cfg";
-import { closeMongo, connectMongo } from "@/db/mongo";
-import { closeRedis, connectRedis } from "@/db/redis";
+import { config } from "@/cfg";
+import { closeMongo, mongo } from "@/db/mongo";
+import { closeRedis, redis } from "@/db/redis";
 import { createTicker, logger } from "@/log";
 import { generateRequestId } from "@/net/middlewares/request";
 import { failure } from "@/net/responses";
-import { createIndexes } from "@/rep/mongo";
+import { index } from "@/rep/mongo";
 import { AppError } from "@/sys/errors";
+import type { BunRequest } from "bun";
+import { ZodError } from "zod";
 import { getCorsHeaders } from "./cors";
 import { routers } from "./router";
 
-let serverInstance: ReturnType<typeof Bun.serve> | null = null;
+let server: ReturnType<typeof Bun.serve> | null = null;
 
 export const startServer = async (): Promise<void> => {
-  const config = await loadConfig();
+  const cfg = await config();
 
-  await connectMongo(config.svc.db.mongo.url);
-  await connectRedis(config.svc.db.redis.url);
-  await createIndexes();
+  await mongo(cfg.svc.db.mongo.url);
+  await redis(cfg.svc.db.redis.url);
+  await index();
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   if (!botToken) {
     throw new Error("TELEGRAM_BOT_TOKEN is required");
   }
 
-  const requestTimeoutSec = 10;
+  const timeout = 10;
   const setTimeout = (req: BunRequest, timeoutSec: number): void => {
-    serverInstance?.timeout(req, timeoutSec);
+    server?.timeout(req, timeoutSec);
   };
 
-  serverInstance = Bun.serve({
-    port: config.svc.port,
+  server = Bun.serve({
+    port: cfg.svc.port,
     routes: routers({
       botToken,
-      csotToken: config.svc.csot.token,
-      sessionSecret: config.svc.auth.session_secret,
-      sessionTtlSec: config.svc.auth.session_ttl_sec,
-      timeoutSec: requestTimeoutSec,
+      csotToken: cfg.svc.csot.token,
+      sessionSecret: cfg.svc.auth.session_secret,
+      sessionTtlSec: cfg.svc.auth.session_ttl_sec,
+      timeoutSec: timeout,
       setTimeout,
     }),
 
@@ -99,10 +99,10 @@ export const startServer = async (): Promise<void> => {
     },
   });
 
-  logger.info(`Server started on port ${config.svc.port}`, {
+  logger.info(`Server started on port ${cfg.svc.port}`, {
     service: "server",
     operation: "start",
-    port: config.svc.port,
+    port: cfg.svc.port,
   });
 };
 
@@ -113,11 +113,9 @@ const shutdown = async (signal: string): Promise<void> => {
     signal,
   });
 
-  if (serverInstance) {
-    serverInstance.stop();
+  if (server) {
+    server.stop();
   }
-
-  await Promise.race([new Promise((resolve) => setTimeout(resolve, 30000)), Promise.resolve()]);
 
   await closeMongo();
   await closeRedis();

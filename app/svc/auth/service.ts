@@ -2,6 +2,7 @@ import type { BunRequest } from "bun";
 import type { AuthResponse, TelegramAuthPayload } from "@/dto/auth";
 import type { UserProfile } from "@/dto/user";
 import { createTicker, logger } from "@/log";
+import { getOrCreateUser } from "@/rep/mongo";
 import { AuthError } from "@/sys/errors";
 import { extractBearerToken } from "./bearer";
 import { extractCookieToken } from "./cookie";
@@ -13,12 +14,9 @@ export const login = async (payload: TelegramAuthPayload, botToken: string): Pro
   const ticker = createTicker();
 
   const user = validateTelegramAuthPayload(payload, botToken);
+  await getOrCreateUser(user);
 
-  // TODO: реализовать бизнес-логику сохранения пользователя в БД
-
-  const result: AuthResponse = {
-    user,
-  };
+  const result: AuthResponse = { user };
 
   logger.info("User logged in", {
     service: "auth",

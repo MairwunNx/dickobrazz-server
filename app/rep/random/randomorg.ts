@@ -1,14 +1,14 @@
 import RandomOrg from "random-org";
-import { getConfig } from "@/cfg";
+import { config } from "@/cfg";
 import { logger } from "@/log";
 import { createTicker } from "@/log/timing";
 import { once } from "@/snc/once";
 
-const client = once(() => new RandomOrg({ apiKey: getConfig().svc.rnd.rndorg.token ?? "похуй" }));
+const client = once(async () => new RandomOrg({ apiKey: (await config()).svc.rnd.rndorg.token ?? "похуй" }), { cachePromise: true });
 
 export const trng = async (min: number, max: number): Promise<number | null> => {
   const ticker = createTicker();
-  const instance = client();
+  const instance = await client();
 
   try {
     const response = await instance.generateIntegers({ n: 1, min, max });

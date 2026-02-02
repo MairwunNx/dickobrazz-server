@@ -1,7 +1,7 @@
 import { createTicker, logger } from "@/log";
 import { getAchievementModel, getCockModel, getUserModel } from "./models";
 
-export const createIndexes = async (): Promise<void> => {
+export const index = async (): Promise<void> => {
   const ticker = createTicker();
 
   try {

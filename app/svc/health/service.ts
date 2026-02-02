@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getRedis } from "@/db/redis";
+import { redis } from "@/db/redis";
 import type { HealthResponse, HealthStatus } from "@/dto/health";
 import { createTicker, logger } from "@/log";
 
@@ -33,7 +33,8 @@ const checkRedis = async (): Promise<HealthStatus> => {
   const ticker = createTicker();
 
   try {
-    await getRedis().ping();
+    const client = await redis();
+    await client.ping();
     logger.debug("Redis health check passed", {
       service: "health",
       operation: "checkRedis",

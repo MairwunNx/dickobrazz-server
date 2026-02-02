@@ -1,44 +1,46 @@
 import { RedisClient } from "bun";
+import { config } from "@/cfg";
 import { createTicker, logger } from "@/log";
+import { once } from "@/snc/once";
 
-let client: RedisClient | null = null;
+export const redis = once(
+  async (): Promise<RedisClient> => {
+    const ticker = createTicker();
+    const url = (await config()).svc.db.redis.url;
 
-export const connectRedis = async (url: string): Promise<RedisClient> => {
-  if (client) return client;
+    try {
+      logger.info("Connecting to Redis", { service: "redis", operation: "connect" });
 
-  const ticker = createTicker();
+      const client = new RedisClient(url, { connectionTimeout: 5000 });
+      await client.ping();
 
-  try {
-    logger.info("Connecting to Redis", { service: "redis", operation: "connect" });
+      logger.info("Redis connected", { service: "redis", operation: "connect", duration_ms: ticker() });
 
-    client = new RedisClient(url, { connectionTimeout: 5000 });
-    await client.ping();
-
-    logger.info("Redis connected", { service: "redis", operation: "connect", duration_ms: ticker() });
-
-    return client;
-  } catch (error) {
-    logger.error("Redis connection failed", {
-      service: "redis",
-      operation: "connect",
-      duration_ms: ticker(),
-      error: {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      },
-    });
-    throw error;
-  }
-};
+      return client;
+    } catch (error) {
+      logger.error("Redis connection failed", {
+        service: "redis",
+        operation: "connect",
+        duration_ms: ticker(),
+        error: {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        },
+      });
+      throw error;
+    }
+  },
+  { cachePromise: true }
+);
 
 export const closeRedis = async (): Promise<void> => {
-  if (!client) return;
-
+  if (!redis.called()) return;
   const ticker = createTicker();
 
   try {
+    const client = await redis();
     client.close?.();
-    client = null;
+    redis.reset();
     logger.info("Redis connection closed", { service: "redis", operation: "close", duration_ms: ticker() });
   } catch (error) {
     logger.error("Redis close failed", {
@@ -50,9 +52,4 @@ export const closeRedis = async (): Promise<void> => {
       },
     });
   }
-};
-
-export const getRedis = (): RedisClient => {
-  if (!client) throw new Error("Redis not connected");
-  return client;
 };

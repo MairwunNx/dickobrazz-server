@@ -5,7 +5,7 @@ import { closeMongo, connectMongo } from "@/db/mongo";
 import { closeRedis, connectRedis } from "@/db/redis";
 import { createTicker, logger } from "@/log";
 import { generateRequestId } from "@/net/middlewares/request";
-import { errorResponse } from "@/net/responses";
+import { failure } from "@/net/responses";
 import { createIndexes } from "@/rep/mongo";
 import { AppError } from "@/sys/errors";
 import { getCorsHeaders } from "./cors";
@@ -62,7 +62,7 @@ export const startServer = async (): Promise<void> => {
         duration_ms: ticker(),
       });
 
-      const response = errorResponse("Not found", "NOT_FOUND", 404);
+      const response = failure("Not found", "NOT_FOUND", 404);
       const corsHeaders = getCorsHeaders(req.headers.get("origin"));
       response.headers.set("X-Request-Id", requestId);
       for (const [key, value] of Object.entries(corsHeaders)) {
@@ -77,7 +77,7 @@ export const startServer = async (): Promise<void> => {
         logger.warn("Validation error", {
           errors: err.issues,
         });
-        return errorResponse(err.issues[0]?.message || "Validation error", "VALIDATION_ERROR", 400);
+        return failure(err.issues[0]?.message || "Validation error", "VALIDATION_ERROR", 400);
       }
 
       if (err instanceof AppError) {
@@ -85,7 +85,7 @@ export const startServer = async (): Promise<void> => {
           code: err.code,
           message: err.message,
         });
-        return errorResponse(err.message, err.code, err.statusCode);
+        return failure(err.message, err.code, err.statusCode);
       }
 
       logger.error("Unhandled error", {
@@ -95,7 +95,7 @@ export const startServer = async (): Promise<void> => {
         },
       });
 
-      return errorResponse("Internal server error", "INTERNAL_ERROR", 500);
+      return failure("Internal server error", "INTERNAL_ERROR", 500);
     },
   });
 

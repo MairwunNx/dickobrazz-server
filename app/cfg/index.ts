@@ -3,6 +3,8 @@ import { loadEnv } from "./env";
 import { type AppConfig, ConfigSchema } from "./schm";
 import { parseYamlWithEnv } from "./yaml";
 
+let runtimeConfig: AppConfig | null = null;
+
 export const loadConfig = async (path = "config.yaml"): Promise<AppConfig> => {
   loadEnv();
 
@@ -12,6 +14,8 @@ export const loadConfig = async (path = "config.yaml"): Promise<AppConfig> => {
   const parsed = parseYamlWithEnv(text);
   const config = ConfigSchema.parse(parsed);
 
+  runtimeConfig = config;
+
   logger.info("Configuration loaded", {
     service: "config",
     operation: "load",
@@ -19,6 +23,13 @@ export const loadConfig = async (path = "config.yaml"): Promise<AppConfig> => {
   });
 
   return config;
+};
+
+export const getConfig = (): AppConfig => {
+  if (!runtimeConfig) {
+    throw new Error("Runtime config not loaded");
+  }
+  return runtimeConfig;
 };
 
 export type { AppConfig };

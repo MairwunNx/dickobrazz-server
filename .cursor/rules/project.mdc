@@ -7,29 +7,22 @@ alwaysApply: true
 
 ## Project Overview
 - Backend API for Dickobrazz (dickobrazz.com), a Telegram bot with daily size, leaderboards, seasons, achievements, and analytics.
-- Stack: Bun (stable), TypeScript (strict), Bun.serve, MongoDB 8.2.3 (mongoose), Redis 8.4 (Bun.redis), Zod, YAML+dotenv, Biome, prom-client, Random.org (@randomorg/core) + crypto.getRandomValues fallback (urandom).
+- Stack: Bun (stable), TypeScript (strict), Bun.serve, MongoDB 8.2.3 (mongoose), Redis 8.4 (Bun.redis), Zod, YAML+dotenv, Biome, prom-client, Random.org (@randomorg/core) + crypto.getRandomValues fallback (urandom), typed-inject for DI with string raw tokens, FAA (Feature-Action Architecture).
 
-## Project Structure
-- `.devcontainer` dev containers and config; `.github` CI; `.vscode` editor settings.
-- `app` source root.
-- `app/cmd` server entry, router, request context, lifecycle.
-- `app/cfg` configuration loading (yaml + env).
-- `app/db` Mongo/Redis connections.
-- `app/dto` API DTOs and validation schemas.
-- `app/log` structured logger.
-- `app/net` handlers, middleware, pagination, responses.
-- `app/rep/mongo` Mongo models, indexes, aggregations, queries.
-- `app/rep/redis` Redis access layer.
-- `app/rep/random` Random.org API client and request wrappers.
-- `app/svc` service layer:
-  - `auth` login/validation
-  - `users` profile and privacy
-  - `cocks` sizes, leaderboards, dynamics, seasons, achievements
-  - `metrics` Prometheus export
-  - `health` health checks
-  - `random` randomness orchestration (Random.org primary, TSNG/crypto fallback (urandom))
-- `app/stt` Prometheus metrics registration/expose.
-- `app/sys` system utilities (time, errors, helpers (e.g work with base64)).
+### Project architecture
+
+See the `./Feature-Action-Architecture` docs.
+
+Examples with TS & Bun & typed-inject: `Feature-Action-Architecture/examples/ts-bun.md`
+
+AI notes: `Feature-Action-Architecture/AI.md`
+Architecture Manifest: `Feature-Action-Architecture/MANIFEST.md`
+
+### DI Pattern
+- Factory functions accepting deps (functional DI via `typed-inject` or manual wiring).
+- Entity factories: `createUserEntity(mongo) => { findById, getOrCreate, ... }`.
+- Feature action factories: `createLoginAction(userEntity, config) => async (data) => {...}`.
+- Container assembled in `app/container.ts`, resolves all dependencies.
 
 ## Core Rules
 - Use Bun native APIs where possible (Bun.serve, Bun.file).
@@ -43,21 +36,23 @@ alwaysApply: true
 - Operations use Moscow time (Europe/Moscow, UTC+3).
 - Keep files small and LLM-friendly; single responsibility per file/function.
 - No comments unless logic is non-obvious; comments can be in Russian.
-- Avoid classes; prefer functional style.
+- No Classes: Use functional programming, factory functions, and closures.
 - Prefer one-liner routes and small, single-purpose functions.
 - Use `using` for resource lifecycle where possible.
-- Avoid polymorphism in hot paths; prefer stable object shapes (const objects).
 - Prefer returning tuples from services instead of try/catch-heavy flows.
 - Route error handling through Bun.serve error handler, including Zod errors.
 - External API calls must use timeouts via AbortController.
 - Keep `/metrics` separate for prom-client; do not mix with API logic.
-- No Classes: Use functional programming, factory functions, and closures.
 - Naming: Brief, descriptive, and consistent.
 
 ## Testing & Checks
 - After any change, run: `bun run check:fix`, `bun run test`, `bun run typecheck`.
-- Write tests for logic that is environment-independent; use `app/cfg/yaml.test.ts` as baseline style.
+- Write tests for logic that is environment-independent.
 - Use Russian language in test `it()` descriptions.
 
 ## References
 - Bun types docs: `node_modules/bun-types/docs/*.md`
+- typed-inject docs: `node_modules/typed-inject/README.md`
+- random-org docs: `node_modules/random-org/README.md`
+- prom client docs: `node_modules/prom-client/README.md`
+- mongoose docs: `node_modules/mongoose/README.md`

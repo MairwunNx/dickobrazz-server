@@ -11,8 +11,18 @@ import type { RouteOptions } from "./types";
 
 type PipelineDeps = {
   validateRequest: (req: BunRequest) => Promise<AuthResult>;
+  handleError: (err: Error) => Response;
   setTimeout: (req: BunRequest, timeoutSec: number) => void;
   timeoutSec: number;
+};
+
+const applyCors = (response: Response, origin: string | null, requestId: string): Response => {
+  const corsHeaders = getCorsHeaders(origin);
+  response.headers.set("X-Request-Id", requestId);
+  for (const [key, value] of Object.entries(corsHeaders)) {
+    response.headers.set(key, String(value));
+  }
+  return response;
 };
 
 export const createPipeline =
@@ -21,14 +31,18 @@ export const createPipeline =
   async (req): Promise<Response> => {
     const ticker = createTicker();
     const requestId = generateRequestId(req.headers);
+    const origin = req.headers.get("origin");
     const context: RequestContext = { request_id: requestId, is_authenticated: false };
 
     return withContext(context, async () => {
       try {
         deps.setTimeout(req, deps.timeoutSec);
-        await authenticateRequest(req, deps.validateRequest, context);
-        if (options.protected) {
-          requireAuth(context);
+
+        if (!options.skipAuth) {
+          await authenticateRequest(req, deps.validateRequest, context);
+          if (options.protected) {
+            requireAuth(context);
+          }
         }
 
         const response = await handler(req);
@@ -44,13 +58,7 @@ export const createPipeline =
           duration_ms: ticker(),
         });
 
-        const corsHeaders = getCorsHeaders(req.headers.get("origin"));
-        response.headers.set("X-Request-Id", requestId);
-        for (const [key, value] of Object.entries(corsHeaders)) {
-          response.headers.set(key, String(value));
-        }
-
-        return response;
+        return applyCors(response, origin, requestId);
       } catch (error) {
         logger.error("Request failed", {
           request_id: requestId,
@@ -64,7 +72,9 @@ export const createPipeline =
             stack: error instanceof Error ? error.stack : undefined,
           },
         });
-        throw error;
+
+        const errorResponse = deps.handleError(error instanceof Error ? error : new Error(String(error)));
+        return applyCors(errorResponse, origin, requestId);
       }
     });
   };

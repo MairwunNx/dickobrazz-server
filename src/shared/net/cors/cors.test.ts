@@ -10,8 +10,9 @@ describe("getCorsHeaders", () => {
     const origin = "https://dickobrazz.com";
     expect(getCorsHeaders(origin)).toEqual({
       "Access-Control-Allow-Origin": origin,
-      "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Internal-Token, X-Internal-User-Id, X-Internal-User-Name, X-Request-Id",
+      "Access-Control-Allow-Credentials": "true",
       "Access-Control-Max-Age": "86400",
       Vary: "Origin",
     });
@@ -25,5 +26,14 @@ describe("getCorsHeaders", () => {
     const origin = "https://app.dickobrazz.com";
     const result = getCorsHeaders(origin);
     expect(result["Access-Control-Allow-Origin"]).toBe(origin);
+  });
+
+  it("блокирует вложенные поддомены", () => {
+    expect(getCorsHeaders("https://evil.sub.dickobrazz.com")).toEqual({});
+  });
+
+  it("включает Access-Control-Allow-Credentials", () => {
+    const result = getCorsHeaders("https://dickobrazz.com");
+    expect(result["Access-Control-Allow-Credentials"]).toBe("true");
   });
 });

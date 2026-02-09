@@ -22,7 +22,7 @@ export const startServer = async (container: Container): Promise<void> => {
     srv?.timeout(req, sec);
   };
 
-  const routeOf = createPipeline({ validateRequest: validateAction, setTimeout, timeoutSec });
+  const routeOf = createPipeline({ validateRequest: validateAction, handleError, setTimeout, timeoutSec });
   const routes = createRoutes(container, routeOf);
 
   srv = Bun.serve({

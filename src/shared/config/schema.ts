@@ -29,6 +29,7 @@ export const ConfigSchema = z.object({
     auth: z.object({
       session_secret: z.string(),
       session_ttl_sec: z.number().default(604800),
+      cookie_domain: z.string().optional(),
     }),
   }),
 });

@@ -2,6 +2,9 @@ import RandomOrg from "random-org";
 import type { AppConfig } from "@/shared/config/schema";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling/timing";
+import { withTimeout } from "@/shared/lib/sync";
+
+const TIMEOUT_MS = 5000;
 
 export const createTrng = (config: AppConfig) => {
   const client = new RandomOrg({ apiKey: config.svc.rnd.rndorg.token ?? "" });
@@ -10,7 +13,7 @@ export const createTrng = (config: AppConfig) => {
     const ticker = createTicker();
 
     try {
-      const response = await client.generateIntegers({ n: 1, min, max });
+      const response = await withTimeout(client.generateIntegers({ n: 1, min, max }), TIMEOUT_MS, "Random.org");
       const numbers = response.random.data;
       const value = numbers[0] ?? null;
 

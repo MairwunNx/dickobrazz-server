@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import type { BunRequest } from "bun";
 import type { UserProfile } from "@/entities/user";
 import type { AppConfig } from "@/shared/config/schema";
@@ -10,6 +11,13 @@ import { extractCookieToken } from "./lib/cookie";
 import { verifySessionToken } from "./lib/token";
 import type { AuthResult } from "./types";
 
+const safeEqual = (a: string, b: string): boolean => {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+};
+
 export const createValidateAction = (config: AppConfig) => {
   const csotToken = config.svc.csot.token;
   const sessionSecret = config.svc.auth.session_secret;
@@ -19,7 +27,7 @@ export const createValidateAction = (config: AppConfig) => {
 
     const internalToken = req.headers.get("x-internal-token");
     if (internalToken) {
-      const isValid = internalToken === csotToken;
+      const isValid = safeEqual(internalToken, csotToken);
 
       logger.info("Internal token validation", {
         service: "auth",

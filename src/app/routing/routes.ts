@@ -7,8 +7,8 @@ export const createRoutes = (container: Container, routeOf: Pipeline): Record<st
   const h = <T extends keyof typeof di>(token: T) => container.resolve(token);
 
   return {
-    "/health": { GET: routeOf(h(di.healthHandler)) },
-    "/metrics": { GET: routeOf(h(di.metricsHandler)) },
+    "/health": { GET: routeOf(h(di.healthHandler), { skipAuth: true }) },
+    "/metrics": { GET: routeOf(h(di.metricsHandler), { skipAuth: true }) },
     "/auth/login": { POST: routeOf(h(di.authHandler)) },
     "/api/v1/me": { GET: routeOf(h(di.meHandler), { protected: true }) },
     "/api/v1/me/privacy": { PATCH: routeOf(h(di.privacyHandler), { protected: true }) },

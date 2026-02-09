@@ -1,9 +1,9 @@
-import type { Db } from "mongodb";
-import mongoose from "mongoose";
 import type { AppConfig } from "@/shared/config/schema";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
+import type { Db } from "mongodb";
+import mongoose from "mongoose";
 
 export const mongo = async (config: AppConfig): Promise<Db> => {
   const ticker = createTicker();
@@ -13,9 +13,9 @@ export const mongo = async (config: AppConfig): Promise<Db> => {
     logger.info("Connecting to MongoDB", { service: "mongo", operation: "connect" });
 
     await mongoose.connect(url, {
-      maxPoolSize: 127,
+      maxPoolSize: 30,
       minPoolSize: 2,
-      timeoutMS: 1000,
+      timeoutMS: 5000,
       compressors: "none",
       appName: "dickobrazz-server",
       retryReads: true,

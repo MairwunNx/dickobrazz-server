@@ -1,9 +1,9 @@
+import type { Db } from "mongodb";
+import mongoose from "mongoose";
 import type { AppConfig } from "@/shared/config/schema";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
-import type { Db } from "mongodb";
-import mongoose from "mongoose";
 
 export const mongo = async (config: AppConfig): Promise<Db> => {
   const ticker = createTicker();

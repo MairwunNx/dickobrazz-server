@@ -1,4 +1,4 @@
-FROM oven/bun:1.3.8-debian AS base
+FROM oven/bun:1.3.9-debian AS base
 WORKDIR /usr/src/app
 
 FROM base AS install

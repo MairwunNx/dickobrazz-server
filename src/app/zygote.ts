@@ -3,7 +3,7 @@ import { mongo } from "@/shared/infra/mongo";
 import { redis } from "@/shared/infra/redis";
 import { logger } from "@/shared/lib/logger";
 import { createContainer } from "./container";
-import { server } from "./server";
+import { startServer } from "./server";
 
 export const initialize = async (): Promise<void> => {
   const cfg = await config();
@@ -23,5 +23,5 @@ export const initialize = async (): Promise<void> => {
     operation: "create",
   });
 
-  await server(container);
+  await startServer(container);
 };

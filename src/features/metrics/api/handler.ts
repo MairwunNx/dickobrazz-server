@@ -1,4 +1,4 @@
-import type { Handler } from "@/app/types";
+import type { Handler } from "@/app/routing";
 import { di } from "@/shared/injection";
 import { registry } from "@/shared/lib/metrics";
 

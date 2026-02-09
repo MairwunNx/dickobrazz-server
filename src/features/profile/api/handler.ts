@@ -1,4 +1,4 @@
-import type { Handler } from "@/app/types";
+import type { Handler } from "@/app/routing";
 import type { UserProfile } from "@/entities/user";
 import { UpdatePrivacyPayloadSchema } from "@/entities/user";
 import { di } from "@/shared/injection";

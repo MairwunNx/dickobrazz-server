@@ -1,4 +1,4 @@
-import type { Handler } from "@/app/types";
+import type { Handler } from "@/app/routing";
 import { di } from "@/shared/injection";
 import { success } from "@/shared/net/response";
 import type { CockSizeResponse, GetSizeParams } from "../types";

@@ -1,4 +1,4 @@
-import type { Handler } from "@/app/types";
+import type { Handler } from "@/app/routing";
 import type { AppConfig } from "@/shared/config/schema";
 import { di } from "@/shared/injection";
 import { setSessionCookie } from "@/shared/net/cookie";

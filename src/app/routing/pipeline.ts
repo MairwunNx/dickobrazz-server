@@ -8,14 +8,14 @@ import { authenticateRequest, requireAuth } from "@/shared/net/middlewares/auth"
 import { generateRequestId } from "@/shared/net/middlewares/request";
 import type { RouteHandler, RouteOptions } from "./types";
 
-type RouteFactoryDeps = {
+type PipelineDeps = {
   validateRequest: (req: BunRequest) => Promise<AuthResult>;
   setTimeout: (req: BunRequest, timeoutSec: number) => void;
   timeoutSec: number;
 };
 
-export const createRouteFactory =
-  (deps: RouteFactoryDeps) =>
+export const createPipeline =
+  (deps: PipelineDeps) =>
   (handler: RouteHandler, options: RouteOptions = {}): RouteHandler =>
   async (req): Promise<Response> => {
     const ticker = createTicker();
@@ -68,4 +68,4 @@ export const createRouteFactory =
     });
   };
 
-export type RouteOf = ReturnType<typeof createRouteFactory>;
+export type Pipeline = ReturnType<typeof createPipeline>;

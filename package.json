@@ -1,6 +1,6 @@
 {
   "name": "dickobrazz-server",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "module": "index.ts",
   "type": "module",
   "private": true,

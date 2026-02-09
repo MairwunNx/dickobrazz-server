@@ -3,7 +3,7 @@ import { mongo } from "@/shared/infra/mongo";
 import { redis } from "@/shared/infra/redis";
 import { logger } from "@/shared/lib/logger";
 import { createContainer } from "./container";
-import { startServer } from "./server";
+import { startServer } from "./server/serve";
 
 export const initialize = async (): Promise<void> => {
   const cfg = await config();

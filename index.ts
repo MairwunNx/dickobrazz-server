@@ -1,3 +1,3 @@
-import { startServer } from "./app/cmd/server";
+import { initialize } from "@/app/zygote";
 
-await startServer();
+await initialize();

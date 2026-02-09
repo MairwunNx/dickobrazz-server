@@ -1,8 +1,8 @@
-import type { Handler } from "@/app/routing";
 import type { AppConfig } from "@/shared/config/schema";
 import { di } from "@/shared/injection";
 import { setSessionCookie } from "@/shared/net/cookie";
 import { failure } from "@/shared/net/response";
+import type { Handler } from "@/shared/net/types";
 import { signSessionToken } from "../lib/token";
 import type { AuthResponse, TelegramAuthPayload } from "../types";
 import { TelegramAuthPayloadSchema } from "../types";

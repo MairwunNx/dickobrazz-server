@@ -1,7 +1,7 @@
-import type { Handler } from "@/app/routing";
 import { di } from "@/shared/injection";
 import { paginationFrom } from "@/shared/net/pagination";
 import { success } from "@/shared/net/response";
+import type { Handler } from "@/shared/net/types";
 import type { CockRulerResponse } from "../types";
 
 type GetRulerAction = (params: { limit?: number; page?: number }) => Promise<CockRulerResponse>;

@@ -1,4 +1,6 @@
 import type { BunRequest } from "bun";
+import { createPipeline } from "@/app/routing/pipeline";
+import { createRoutes } from "@/app/routing/routes";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
@@ -6,8 +8,6 @@ import { getCorsHeaders } from "@/shared/net/cors/cors";
 import { generateRequestId } from "@/shared/net/middlewares/request";
 import { failure } from "@/shared/net/response";
 import type { Container } from "../container";
-import { createPipeline } from "@/app/routing/pipeline";
-import { createRoutes } from "@/app/routing/routes";
 import { handleError } from "./errors";
 import { registerShutdown } from "./shutdown";
 

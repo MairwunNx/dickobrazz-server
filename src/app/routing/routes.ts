@@ -1,9 +1,9 @@
 import { di } from "@/shared/injection";
+import type { Handler } from "@/shared/net/types";
 import type { Container } from "../container";
 import type { Pipeline } from "./pipeline";
-import type { RouteHandler } from "./types";
 
-export const createRoutes = (container: Container, routeOf: Pipeline): Record<string, RouteHandler | Record<string, RouteHandler>> => {
+export const createRoutes = (container: Container, routeOf: Pipeline): Record<string, Handler | Record<string, Handler>> => {
   const h = <T extends keyof typeof di>(token: T) => container.resolve(token);
 
   return {

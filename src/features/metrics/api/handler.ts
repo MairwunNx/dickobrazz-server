@@ -1,6 +1,6 @@
-import type { Handler } from "@/app/routing";
 import { di } from "@/shared/injection";
 import { registry } from "@/shared/lib/metrics";
+import type { Handler } from "@/shared/net/types";
 
 type ExportMetricsAction = () => Promise<string>;
 

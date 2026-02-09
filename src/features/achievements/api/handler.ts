@@ -1,6 +1,6 @@
-import type { Handler } from "@/app/routing";
 import { di } from "@/shared/injection";
 import { success } from "@/shared/net/response";
+import type { Handler } from "@/shared/net/types";
 import type { CockAchievementsResponse } from "../types";
 
 type GetAchievementsAction = (userId: number) => Promise<CockAchievementsResponse>;

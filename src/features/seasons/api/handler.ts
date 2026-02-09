@@ -1,7 +1,7 @@
-import type { Handler } from "@/app/routing";
 import { di } from "@/shared/injection";
 import { paginationFrom } from "@/shared/net/pagination";
 import { success } from "@/shared/net/response";
+import type { Handler } from "@/shared/net/types";
 import type { CockSeasonsResponse } from "../types";
 
 type GetSeasonsAction = (params: { limit?: number; page?: number }) => Promise<CockSeasonsResponse>;

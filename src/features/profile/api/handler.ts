@@ -1,8 +1,8 @@
-import type { Handler } from "@/app/routing";
 import type { UserProfile } from "@/entities/user";
 import { UpdatePrivacyPayloadSchema } from "@/entities/user";
 import { di } from "@/shared/injection";
 import { failure, success } from "@/shared/net/response";
+import type { Handler } from "@/shared/net/types";
 import type { UpdatePrivacyParams } from "../types";
 
 type GetProfileAction = (userId: number) => Promise<UserProfile>;

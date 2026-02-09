@@ -6,7 +6,8 @@ import { createTicker } from "@/shared/lib/profiling";
 import { getCorsHeaders } from "@/shared/net/cors/cors";
 import { authenticateRequest, requireAuth } from "@/shared/net/middlewares/auth";
 import { generateRequestId } from "@/shared/net/middlewares/request";
-import type { RouteHandler, RouteOptions } from "./types";
+import type { Handler } from "@/shared/net/types";
+import type { RouteOptions } from "./types";
 
 type PipelineDeps = {
   validateRequest: (req: BunRequest) => Promise<AuthResult>;
@@ -16,7 +17,7 @@ type PipelineDeps = {
 
 export const createPipeline =
   (deps: PipelineDeps) =>
-  (handler: RouteHandler, options: RouteOptions = {}): RouteHandler =>
+  (handler: Handler, options: RouteOptions = {}): Handler =>
   async (req): Promise<Response> => {
     const ticker = createTicker();
     const requestId = generateRequestId(req.headers);

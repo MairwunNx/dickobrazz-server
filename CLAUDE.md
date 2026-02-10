@@ -79,6 +79,7 @@ App → Features → Entities → Shared
 - Communicate with user preferably in Russian; thinking in English is fine.
 - Name commits shortly in Russian language.
 - Use emoji before commit summary that describes the changes.
+- After finishing the task, provide a summary with checkmarks ✅ emoji tasks you've completed.
 
 ## References
 

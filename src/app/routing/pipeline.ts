@@ -4,13 +4,14 @@ import { type RequestContext, withContext } from "@/shared/context/context";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import { getCorsHeaders } from "@/shared/net/cors/cors";
-import { authenticateRequest, requireAuth } from "@/shared/net/middlewares/auth";
+import { authenticateRequest, requireAuth, syncUser } from "@/shared/net/middlewares/auth";
 import { generateRequestId } from "@/shared/net/middlewares/request";
 import type { Handler } from "@/shared/net/types";
 import type { RouteOptions } from "./types";
 
 type PipelineDeps = {
   validateRequest: (req: BunRequest) => Promise<AuthResult>;
+  syncUserInDb: (userId: number, username?: string) => Promise<unknown>;
   handleError: (err: Error) => Response;
   setTimeout: (req: BunRequest, timeoutSec: number) => void;
   timeoutSec: number;
@@ -40,6 +41,9 @@ export const createPipeline =
 
         if (!options.skipAuth) {
           await authenticateRequest(req, deps.validateRequest, context);
+          if (context.user) {
+            await syncUser(context, deps.syncUserInDb);
+          }
           if (options.protected) {
             requireAuth(context);
           }

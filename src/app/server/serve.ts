@@ -14,6 +14,7 @@ import { registerShutdown } from "./shutdown";
 export const startServer = async (container: Container): Promise<void> => {
   const cfg = container.resolve(di.config);
   const validateAction = container.resolve(di.validateAction);
+  const userDal = container.resolve(di.userDal);
 
   const timeoutSec = 10;
   let srv: ReturnType<typeof Bun.serve> | null = null;
@@ -22,7 +23,7 @@ export const startServer = async (container: Container): Promise<void> => {
     srv?.timeout(req, sec);
   };
 
-  const routeOf = createPipeline({ validateRequest: validateAction, handleError, setTimeout, timeoutSec });
+  const routeOf = createPipeline({ validateRequest: validateAction, syncUserInDb: userDal.sync, handleError, setTimeout, timeoutSec });
   const routes = createRoutes(container, routeOf);
 
   srv = Bun.serve({

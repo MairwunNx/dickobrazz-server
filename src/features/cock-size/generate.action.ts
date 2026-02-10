@@ -1,6 +1,6 @@
 import type { RedisClient } from "bun";
 import type { CockDal } from "@/entities/cock";
-import { getContext } from "@/shared/context";
+import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
 import { computeHash } from "@/shared/lib/crypto";
 import { getMoscowDate, getTtlToMoscowMidnight } from "@/shared/lib/datetime";
@@ -29,7 +29,7 @@ export const createGenerateSizeAction =
     }
 
     const size = await random(0, 61);
-    const nickname = getContext()?.user?.username ?? "";
+    const nickname = getAuthUser().username ?? "";
 
     await cockDal.create({
       _id: crypto.randomUUID(),

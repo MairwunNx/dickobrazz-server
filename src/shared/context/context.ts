@@ -18,3 +18,9 @@ export const withContext = async <T>(context: RequestContext, fn: () => T | Prom
 export const getContext = (): RequestContext | null => {
   return requestStorage.getStore() ?? null;
 };
+
+export const getAuthUser = (): UserProfile => {
+  const ctx = requestStorage.getStore();
+  if (!ctx?.user) throw new Error("Unauthorized: user not found in context");
+  return ctx.user;
+};

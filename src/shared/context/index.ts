@@ -1,1 +1,1 @@
-export { getContext, withContext } from "./context";
+export { getAuthUser, getContext, withContext } from "./context";

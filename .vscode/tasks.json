@@ -1,0 +1,68 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev",
+      "type": "shell",
+      "command": "bun run dev",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "start",
+      "type": "shell",
+      "command": "bun run start",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "bun run build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "test",
+      "type": "shell",
+      "command": "bun run test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "check:fix",
+      "type": "shell",
+      "command": "bun run check:fix",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "typecheck",
+      "type": "shell",
+      "command": "bun run typecheck",
+      "group": "none",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "verify",
+      "dependsOn": ["check:fix", "test", "typecheck"],
+      "dependsOrder": "sequence",
+      "group": "none",
+      "problemMatcher": []
+    }
+  ]
+}

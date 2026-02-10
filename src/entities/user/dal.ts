@@ -33,6 +33,18 @@ export const createUserDal = () => {
       return result as UserDoc;
     },
 
+    sync: (userId: number, username?: string) =>
+      model
+        .findOneAndUpdate(
+          { user_id: userId },
+          {
+            $set: { username, updated_at: new Date() },
+            $setOnInsert: { user_id: userId, is_hidden: false },
+          },
+          { upsert: true, new: true, lean: true }
+        )
+        .exec(),
+
     count: () => model.countDocuments().exec(),
 
     syncIndexes: () => model.syncIndexes(),

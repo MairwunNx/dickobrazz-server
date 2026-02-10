@@ -7,6 +7,12 @@ export const createUserDal = () => {
   return {
     findByUserId: (userId: number) => model.findOne({ user_id: userId }).lean<UserDoc>().exec(),
 
+    findByUserIds: (userIds: number[]) =>
+      model
+        .find({ user_id: { $in: userIds } })
+        .lean<UserDoc[]>()
+        .exec(),
+
     create: (data: Omit<UserDoc, "updated_at">) => model.create({ ...data, updated_at: new Date() }),
 
     upsert: (userId: number, data: Partial<UserDoc>) =>

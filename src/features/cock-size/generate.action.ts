@@ -48,6 +48,8 @@ export const createGenerateSizeAction = (cockDal: CockDal, redis: RedisClient, r
   try {
     await redis.set(cacheKey, cacheValue);
     await redis.expire(cacheKey, ttl);
+    await redis.zadd("ruler:daily", String(size), String(userId));
+    await redis.expire("ruler:daily", ttl);
   } catch (error) {
     logger.error("Failed to cache cock size in Redis", {
       service: "cocks",

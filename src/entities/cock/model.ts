@@ -13,6 +13,7 @@ const cockSchema = new mongoose.Schema<CockDoc>(
 );
 
 cockSchema.index({ user_id: 1, requested_at: 1 });
+cockSchema.index({ user_id: 1, size: 1 }); // covered scan для ladder $group + $sum
 cockSchema.index({ size: -1 });
 cockSchema.index({ requested_at: 1 });
 

@@ -1,11 +1,11 @@
 import type { BunRequest } from "bun";
+import { generateRequestId } from "@/app/middlewares/request";
 import { createPipeline } from "@/app/routing/pipeline";
 import { createRoutes } from "@/app/routing/routes";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import { getCorsHeaders } from "@/shared/net/cors/cors";
-import { generateRequestId } from "@/shared/net/middlewares/request";
 import { failure } from "@/shared/net/response";
 import type { Container } from "../container";
 import { handleError } from "./errors";
@@ -13,8 +13,6 @@ import { registerShutdown } from "./shutdown";
 
 export const startServer = async (container: Container): Promise<void> => {
   const cfg = container.resolve(di.config);
-  const validateAction = container.resolve(di.validateAction);
-  const userDal = container.resolve(di.userDal);
 
   const timeoutSec = 10;
   let srv: ReturnType<typeof Bun.serve> | null = null;
@@ -23,7 +21,7 @@ export const startServer = async (container: Container): Promise<void> => {
     srv?.timeout(req, sec);
   };
 
-  const routeOf = createPipeline({ validateRequest: validateAction, syncUserInDb: userDal.sync, handleError, setTimeout, timeoutSec });
+  const routeOf = createPipeline({ container, handleError, setTimeout, timeoutSec });
   const routes = createRoutes(container, routeOf);
 
   srv = Bun.serve({

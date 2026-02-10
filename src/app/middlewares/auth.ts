@@ -5,9 +5,7 @@ import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import { AuthError } from "@/shared/net/response";
 
-type ValidateRequestFn = (req: BunRequest) => Promise<AuthResult>;
-
-export const authenticateRequest = async (req: BunRequest, validateRequest: ValidateRequestFn, context: RequestContext): Promise<void> => {
+export const authenticateRequest = async (req: BunRequest, validateRequest: (req: BunRequest) => Promise<AuthResult>, context: RequestContext): Promise<void> => {
   const ticker = createTicker();
 
   const authResult = await validateRequest(req);

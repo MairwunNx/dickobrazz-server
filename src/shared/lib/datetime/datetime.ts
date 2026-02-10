@@ -20,6 +20,14 @@ export const formatMoscowISO = (date: Date): string => {
   return new Date(date.toLocaleString("en-US", { timeZone: MOSCOW_TZ })).toISOString().replace("Z", "+03:00");
 };
 
+export const getTtlToMoscowMidnight = (): number => {
+  const now = getMoscowDate();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return Math.floor((tomorrow.getTime() - now.getTime()) / 1000);
+};
+
 export const isSameDay = (date1: Date, date2: Date): boolean => {
   const d1 = new Date(date1.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
   const d2 = new Date(date2.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));

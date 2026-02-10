@@ -1,17 +1,17 @@
 import type { BunRequest } from "bun";
-import type { AuthResult } from "@/features/auth";
+import type { Container } from "@/app/container";
+import { authenticateRequest, requireAuth } from "@/app/middlewares/auth";
+import { generateRequestId } from "@/app/middlewares/request";
 import { type RequestContext, withContext } from "@/shared/context/context";
+import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import { getCorsHeaders } from "@/shared/net/cors/cors";
-import { authenticateRequest, requireAuth, syncUser } from "@/shared/net/middlewares/auth";
-import { generateRequestId } from "@/shared/net/middlewares/request";
 import type { Handler } from "@/shared/net/types";
 import type { RouteOptions } from "./types";
 
 type PipelineDeps = {
-  validateRequest: (req: BunRequest) => Promise<AuthResult>;
-  syncUserInDb: (userId: number, username?: string) => Promise<unknown>;
+  container: Container;
   handleError: (err: Error) => Response;
   setTimeout: (req: BunRequest, timeoutSec: number) => void;
   timeoutSec: number;
@@ -35,14 +35,21 @@ export const createPipeline =
     const origin = req.headers.get("origin");
     const context: RequestContext = { request_id: requestId, is_authenticated: false };
 
+    const validateAction = deps.container.resolve(di.validateAction);
+    const userDal = deps.container.resolve(di.userDal);
+
     return withContext(context, async () => {
       try {
         deps.setTimeout(req, deps.timeoutSec);
 
         if (!options.skipAuth) {
-          await authenticateRequest(req, deps.validateRequest, context);
+          await authenticateRequest(req, validateAction, context);
           if (context.user) {
-            await syncUser(context, deps.syncUserInDb);
+            await userDal.sync(context.user.id, context.user.username);
+            logger.debug("User synced", {
+              request_id: context.request_id,
+              user_id: context.user.id,
+            });
           }
           if (options.protected) {
             requireAuth(context);

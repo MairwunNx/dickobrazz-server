@@ -1,11 +1,13 @@
+import { getAuthUser } from "@/shared/context";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { CockDynamicResponse } from "./types";
 
 export const createGetDynamicPersonalAction =
   () =>
-  async (userId: number): Promise<CockDynamicResponse> => {
+  async (): Promise<CockDynamicResponse> => {
     const ticker = createTicker();
+    const userId = getAuthUser().id;
 
     // TODO: реализовать бизнес-логику
     const result: CockDynamicResponse = {

@@ -1,11 +1,13 @@
+import { getAuthUser } from "@/shared/context";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { CockAchievementsResponse } from "./types";
 
 export const createGetAchievementsAction =
   () =>
-  async (userId: number): Promise<CockAchievementsResponse> => {
+  async (): Promise<CockAchievementsResponse> => {
     const ticker = createTicker();
+    const userId = getAuthUser().id;
 
     // TODO: реализовать бизнес-логику
     const result: CockAchievementsResponse = { achievements: [] };

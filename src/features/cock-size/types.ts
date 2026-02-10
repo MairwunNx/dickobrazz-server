@@ -7,7 +7,3 @@ export const CockSizeResponseSchema = z.object({
 });
 
 export type CockSizeResponse = z.infer<typeof CockSizeResponseSchema>;
-
-export interface GetSizeParams {
-  user_id: number;
-}

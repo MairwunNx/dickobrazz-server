@@ -3,11 +3,11 @@ import { success } from "@/shared/net/response";
 import type { Handler } from "@/shared/net/types";
 import type { CockAchievementsResponse } from "../types";
 
-type GetAchievementsAction = (userId: number) => Promise<CockAchievementsResponse>;
+type GetAchievementsAction = () => Promise<CockAchievementsResponse>;
 
 export const createAchievementsHandler =
   (getAchievementsAction: GetAchievementsAction): Handler =>
   async () =>
-    success(await getAchievementsAction(0)); // TODO: userId из контекста
+    success(await getAchievementsAction());
 
 createAchievementsHandler.inject = [di.getAchievementsAction] as const;

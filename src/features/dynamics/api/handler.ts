@@ -4,7 +4,7 @@ import type { Handler } from "@/shared/net/types";
 import type { CockDynamicGlobalResponse, CockDynamicResponse } from "../types";
 
 type GetDynamicGlobalAction = () => Promise<CockDynamicGlobalResponse>;
-type GetDynamicPersonalAction = (userId: number) => Promise<CockDynamicResponse>;
+type GetDynamicPersonalAction = () => Promise<CockDynamicResponse>;
 
 export const createDynamicGlobalHandler =
   (getDynamicGlobalAction: GetDynamicGlobalAction): Handler =>
@@ -16,6 +16,6 @@ createDynamicGlobalHandler.inject = [di.getDynamicGlobalAction] as const;
 export const createDynamicPersonalHandler =
   (getDynamicPersonalAction: GetDynamicPersonalAction): Handler =>
   async () =>
-    success(await getDynamicPersonalAction(0)); // TODO: userId из контекста
+    success(await getDynamicPersonalAction());
 
 createDynamicPersonalHandler.inject = [di.getDynamicPersonalAction] as const;

@@ -1,11 +1,13 @@
 import type { UserProfile } from "@/entities/user";
+import { getAuthUser } from "@/shared/context";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 
 export const createGetProfileAction =
   () =>
-  async (userId: number): Promise<UserProfile> => {
+  async (): Promise<UserProfile> => {
     const ticker = createTicker();
+    const userId = getAuthUser().id;
 
     // TODO: реализовать бизнес-логику получения профиля пользователя
     const result: UserProfile = {

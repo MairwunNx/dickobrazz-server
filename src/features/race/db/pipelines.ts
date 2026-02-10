@@ -1,36 +1,57 @@
 import type { PipelineStage } from "mongoose";
 
-export const pRaceLeaders = (startDate: Date, endDate: Date, limit: number, page: number): PipelineStage[] => [
-  { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
-  { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
-  { $sort: { total_size: -1 } },
-  { $skip: Math.max(page - 1, 0) * limit },
-  { $limit: limit },
-];
+export interface AggLeader {
+  _id: number;
+  total_size: number;
+}
 
-export const pRaceParticipants = (startDate: Date, endDate: Date): PipelineStage[] => [
-  { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
-  { $group: { _id: "$user_id" } },
-  { $count: "total" },
-];
+export interface AggLeadersAndCount {
+  leaders: AggLeader[];
+  total: [{ count: number }] | [];
+}
 
-export const pRaceUserPosition = (userId: number, startDate: Date, endDate: Date): PipelineStage[] => [
-  { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
+export interface AggUserContext {
+  _id: number;
+  total_size: number;
+  position: number;
+  above_id: number | null;
+  above_size: number | null;
+  below_id: number | null;
+  below_size: number | null;
+}
+
+const dateMatch = (startDate?: Date, endDate?: Date): PipelineStage[] => (startDate && endDate ? [{ $match: { requested_at: { $gte: startDate, $lt: endDate } } }] : []);
+
+/** Один скан: leaders (с пагинацией) + total count через $facet. Без дат — all-time. */
+export const pRaceLeadersAndCount = (limit: number, page: number, startDate?: Date, endDate?: Date): PipelineStage[] => [
+  ...dateMatch(startDate, endDate),
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
-  { $sort: { total_size: -1 } },
-  { $group: { _id: null, users: { $push: { user_id: "$_id", total_size: "$total_size" } } } },
-  { $unwind: { path: "$users", includeArrayIndex: "position" } },
-  { $match: { "users.user_id": userId } },
-  { $project: { _id: 0, position: { $add: ["$position", 1] } } },
+  { $sort: { total_size: -1 as const } },
+  {
+    $facet: {
+      leaders: [{ $skip: Math.max(page - 1, 0) * limit }, { $limit: limit }],
+      total: [{ $count: "count" }],
+    },
+  },
 ];
 
-export const pRaceNeighborhood = (position: number, startDate: Date, endDate: Date): PipelineStage[] => {
-  const skip = Math.max(position - 2, 0);
-  return [
-    { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
-    { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
-    { $sort: { total_size: -1 } },
-    { $skip: skip },
-    { $limit: 3 },
-  ];
-};
+/** Один скан: позиция юзера + соседи через $setWindowFields ($rank + $shift). Без дат — all-time. */
+export const pRaceUserContext = (userId: number, startDate?: Date, endDate?: Date): PipelineStage[] => [
+  ...dateMatch(startDate, endDate),
+  { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
+  {
+    $setWindowFields: {
+      sortBy: { total_size: -1 as const },
+      output: {
+        position: { $rank: {} },
+        above_id: { $shift: { output: "$_id", by: -1, default: null } },
+        above_size: { $shift: { output: "$total_size", by: -1, default: null } },
+        below_id: { $shift: { output: "$_id", by: 1, default: null } },
+        below_size: { $shift: { output: "$total_size", by: 1, default: null } },
+      },
+    },
+  },
+  { $match: { _id: userId } },
+];
+
+export const pFirstCockDate = (): PipelineStage[] => [{ $sort: { requested_at: 1 as const } }, { $limit: 1 }, { $project: { _id: 0, first_date: "$requested_at" } }];

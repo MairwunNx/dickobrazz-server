@@ -5,6 +5,7 @@
     "": {
       "name": "dickobrazz-server",
       "dependencies": {
+        "@js-temporal/polyfill": "^0.5.1",
         "@telegram-apps/init-data-node": "^2.0.10",
         "dotenv": "^17.2.3",
         "mongodb": "^7.0.0",
@@ -43,6 +44,8 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.3.14", "", { "os": "win32", "cpu": "x64" }, "sha512-oizCjdyQ3WJEswpb3Chdngeat56rIdSYK12JI3iI11Mt5T5EXcZ7WLuowzEaFPNJ3zmOQFliMN8QY1Pi+qsfdQ=="],
 
+    "@js-temporal/polyfill": ["@js-temporal/polyfill@0.5.1", "", { "dependencies": { "jsbi": "^4.3.0" } }, "sha512-hloP58zRVCRSpgDxmqCWJNlizAlUgJFqG2ypq79DCvyv9tHjRYMDOcPFjzfl/A1/YxDvRCZz8wvZvmapQnKwFQ=="],
+
     "@mongodb-js/saslprep": ["@mongodb-js/saslprep@1.4.5", "", { "dependencies": { "sparse-bitfield": "^3.0.3" } }, "sha512-k64Lbyb7ycCSXHSLzxVdb2xsKGPMvYZfCICXvDsI8Z65CeWQzTEKS4YmGbnqw+U9RBvLPTsB6UCmwkgsDTGWIw=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
@@ -72,6 +75,8 @@
     "dotenv": ["dotenv@17.2.3", "", {}, "sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w=="],
 
     "error-kid": ["error-kid@0.0.7", "", {}, "sha512-8mFs7ZaDWlBFgjOy4lHLMCe2+KZfZXGx5GOgh2VQ/M1CCIvSWzbl2OMl+5fdZgrgoUfhTeF+NPhmqfEvUhN8yw=="],
+
+    "jsbi": ["jsbi@4.3.2", "", {}, "sha512-9fqMSQbhJykSeii05nxKl4m6Eqn2P6rOlYiS+C5Dr/HPIU/7yZxu5qzbs40tgaFORiw2Amd0mirjxatXYMkIew=="],
 
     "kareem": ["kareem@3.0.0", "", {}, "sha512-RKhaOBSPN8L7y4yAgNhDT2602G5FD6QbOIISbjN9D6mjHPeqeg7K+EB5IGSU5o81/X2Gzm3ICnAvQW3x3OP8HA=="],
 

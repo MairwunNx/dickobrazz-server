@@ -24,6 +24,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "@telegram-apps/init-data-node": "^2.0.10",
     "dotenv": "^17.2.3",
     "mongodb": "^7.0.0",

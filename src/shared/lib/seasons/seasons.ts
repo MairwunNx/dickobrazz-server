@@ -1,3 +1,5 @@
+import { Temporal } from "@js-temporal/polyfill";
+
 export interface CockSeason {
   season_num: number;
   start_date: string;
@@ -5,41 +7,31 @@ export interface CockSeason {
   is_active: boolean;
 }
 
-const MOSCOW_TZ = "Europe/Moscow";
+const TZ = "Europe/Moscow";
 const SEASON_MONTHS = 3;
 
-const startOfDayMoscow = (date: Date): Date => {
-  const moscowDate = new Date(date.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
-  moscowDate.setHours(0, 0, 0, 0);
-  return moscowDate;
-};
-
-const addMonths = (date: Date, months: number): Date => {
-  const result = new Date(date);
-  result.setMonth(result.getMonth() + months);
-  return result;
-};
+const toISO = (date: Temporal.PlainDate): string => new Date(date.toZonedDateTime({ timeZone: TZ }).epochMilliseconds).toISOString();
 
 export const getAllSeasons = (firstCockDate: Date): CockSeason[] => {
-  const normalizedFirst = startOfDayMoscow(firstCockDate);
-  const now = startOfDayMoscow(new Date());
+  const first = Temporal.Instant.fromEpochMilliseconds(firstCockDate.getTime()).toZonedDateTimeISO(TZ).startOfDay().toPlainDate();
+  const today = Temporal.Now.plainDateISO(TZ);
 
   const seasons: CockSeason[] = [];
-  let currentDate = normalizedFirst;
+  let current = first;
   let seasonNum = 1;
 
-  while (currentDate <= now) {
-    const endDate = addMonths(currentDate, SEASON_MONTHS);
-    const isActive = now >= currentDate && now < endDate;
+  while (Temporal.PlainDate.compare(current, today) <= 0) {
+    const end = current.add({ months: SEASON_MONTHS });
+    const isActive = Temporal.PlainDate.compare(today, current) >= 0 && Temporal.PlainDate.compare(today, end) < 0;
 
     seasons.push({
       season_num: seasonNum,
-      start_date: currentDate.toISOString(),
-      end_date: endDate.toISOString(),
+      start_date: toISO(current),
+      end_date: toISO(end),
       is_active: isActive,
     });
 
-    currentDate = endDate;
+    current = end;
     seasonNum++;
   }
 

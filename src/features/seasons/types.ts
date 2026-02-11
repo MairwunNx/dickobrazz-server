@@ -15,8 +15,17 @@ export const SeasonWinnerSchema = z.object({
   place: z.number(),
 });
 
+export const SeasonNeighborhoodSchema = z.object({
+  above: SeasonWinnerSchema.array(),
+  self: SeasonWinnerSchema.optional(),
+  below: SeasonWinnerSchema.array(),
+});
+
 export const SeasonWithWinnersSchema = SeasonInfoSchema.extend({
   winners: SeasonWinnerSchema.array(),
+  total_participants: z.number(),
+  user_position: z.number().nullable().optional(),
+  neighborhood: SeasonNeighborhoodSchema,
 });
 
 export const CockSeasonsResponseSchema = z.object({
@@ -26,5 +35,6 @@ export const CockSeasonsResponseSchema = z.object({
 
 export type SeasonInfo = z.infer<typeof SeasonInfoSchema>;
 export type SeasonWinner = z.infer<typeof SeasonWinnerSchema>;
+export type SeasonNeighborhood = z.infer<typeof SeasonNeighborhoodSchema>;
 export type SeasonWithWinners = z.infer<typeof SeasonWithWinnersSchema>;
 export type CockSeasonsResponse = z.infer<typeof CockSeasonsResponseSchema>;

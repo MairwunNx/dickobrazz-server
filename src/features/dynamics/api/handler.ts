@@ -1,10 +1,10 @@
 import { di } from "@/shared/injection";
 import { success } from "@/shared/net/response";
 import type { Handler } from "@/shared/net/types";
-import type { CockDynamicGlobalResponse, CockDynamicResponse } from "../types";
+import type { CockDynamicIndividual, CockDynamicOverall } from "../types";
 
-type GetDynamicGlobalAction = () => Promise<CockDynamicGlobalResponse>;
-type GetDynamicPersonalAction = () => Promise<CockDynamicResponse>;
+type GetDynamicGlobalAction = () => Promise<CockDynamicOverall>;
+type GetDynamicPersonalAction = () => Promise<CockDynamicIndividual>;
 
 export const createDynamicGlobalHandler =
   (getDynamicGlobalAction: GetDynamicGlobalAction): Handler =>

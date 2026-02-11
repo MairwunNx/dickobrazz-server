@@ -5,12 +5,15 @@ import { getMoscowDate } from "@/shared/lib/datetime";
 import { logger } from "@/shared/lib/logger";
 import { activeUsersGauge, registry, sizeDistributionGauge, totalUsersGauge } from "@/shared/lib/metrics";
 import { pActiveUsersSince, pSizeDistribution } from "./db/pipelines";
+import { createTicker } from "@/shared/lib/profiling";
 
 export const createExportMetricsAction = (cockDal: CockDal, userDal: UserDal) => async (): Promise<string> => {
   logger.debug("Exporting Prometheus metrics", {
     service: "metrics",
     operation: "export",
   });
+
+  const ticker = createTicker();
 
   const now = getMoscowDate();
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -29,9 +32,21 @@ export const createExportMetricsAction = (cockDal: CockDal, userDal: UserDal) =>
   totalUsersGauge.set(totalUsers);
   activeUsersGauge.set({ window: "dau" }, dau);
   activeUsersGauge.set({ window: "mau" }, mau);
+
+  sizeDistributionGauge.reset();
   for (const bucket of distribution) {
     sizeDistributionGauge.set({ bucket: String(bucket._id) }, bucket.count);
   }
+
+  logger.debug("Metrics exported", {
+    service: "metrics",
+    operation: "export",
+    duration_ms: ticker(),
+    total_users: totalUsers,
+    dau: dau,
+    mau: mau,
+    size_distribution: distribution,
+  });
 
   return await registry.metrics();
 };

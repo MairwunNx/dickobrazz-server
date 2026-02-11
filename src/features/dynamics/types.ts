@@ -11,7 +11,7 @@ export const CockDynamicPercentileSchema = z.object({
 });
 
 export const CockDynamicRecordSchema = z.object({
-  requested_at: z.string(),
+  requested_at: z.string().nullable(),
   total: z.number(),
 });
 
@@ -45,7 +45,7 @@ export const CockDynamicIndividualSchema = z.object({
   daily_dynamics: CockDynamicDailyDynamicsSchema,
   five_cocks_dynamics: CockDynamicFiveCocksDynamicsSchema,
   growth_speed: z.number(),
-  first_cock_date: z.string(),
+  first_cock_date: z.string().nullable(),
   luck_coefficient: z.number(),
   volatility: z.number(),
   cocks_count: z.number(),

@@ -39,7 +39,7 @@ export const createGetDynamicPersonalAction = (cockDal: CockDal) => async (): Pr
     recent_average: userRecent?.average ?? 0,
     irk: totals?.irk ?? 0,
     record: {
-      requested_at: userRecord?.requested_at?.toISOString() ?? new Date().toISOString(),
+      requested_at: userRecord?.requested_at?.toISOString() ?? null,
       total: userRecord?.total ?? 0,
     },
     dominance: totals?.dominance ?? 0,
@@ -53,7 +53,7 @@ export const createGetDynamicPersonalAction = (cockDal: CockDal) => async (): Pr
       five_cocks_change_percent: fiveCocks?.five_cocks_change_percent ?? 0,
     },
     growth_speed: userGrowth?.growth_speed ?? 0,
-    first_cock_date: firstDate?.first_date?.toISOString() ?? new Date().toISOString(),
+    first_cock_date: firstDate?.first_date?.toISOString() ?? null,
     luck_coefficient: luck?.luck_coefficient ?? 1.0,
     volatility: vol?.volatility ?? 0,
     cocks_count: totals?.user_count ?? 0,

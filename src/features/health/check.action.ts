@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
+import packageJson from "../../../package.json";
 import type { HealthResponse, HealthStatus } from "./types";
 
 const startTime = Date.now();
@@ -56,8 +57,7 @@ export const createCheckAction = (redis: RedisClient) => async (): Promise<Healt
 
   const [mongoStatus, redisStatus] = await Promise.all([checkMongo(), checkRedis(redis)]);
 
-  const versionFile = Bun.file(".version");
-  const version = (await versionFile.text()).trim();
+  const version = packageJson.version;
   const uptimeSec = Math.floor((Date.now() - startTime) / 1000);
   const overallStatus: HealthStatus = mongoStatus === "ok" && redisStatus === "ok" ? "ok" : mongoStatus === "down" || redisStatus === "down" ? "down" : "degraded";
 

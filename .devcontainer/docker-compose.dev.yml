@@ -10,7 +10,11 @@ services:
     cap_add: [ "SYS_PTRACE" ]
     command: ["sleep", "infinity"]
     container_name: dickobrazz-server-dev
-    depends_on: [ dickobrazz-mongo, dickobrazz-redis ]
+    depends_on:
+      dickobrazz-mongo:
+        condition: service_healthy
+      dickobrazz-redis:
+        condition: service_healthy
     env_file: [ devcontainer.env ]
     networks: [ base ]
     ports: [ "3030:3030" ]
@@ -23,11 +27,6 @@ services:
     container_name: dickobrazz-mongo
     cpus: '0.5'
     env_file: [ devcontainer.env ]
-    environment:
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      TZ: ${TZ}
     healthcheck:
       interval: 15s
       retries: 12
@@ -48,22 +47,18 @@ services:
     volumes:
       - dickobrazz-mongo-data:/data/db
   dickobrazz-redis:
-    command: >
-      redis-server --port 6379
-      --loglevel warning
-      --save 20 1
-      --requirepass ${REDIS_PASSWORD}
+    command:
+      - sh
+      - -c
+      - 'exec redis-server --port 6379 --loglevel warning --save "20 1" --requirepass "$$REDIS_PASSWORD"'
     container_name: dickobrazz-redis
     cpus: '0.5'
     env_file: [ devcontainer.env ]
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      TZ: ${TZ}
     healthcheck:
       interval: 10s
       retries: 3
       start_period: 10s
-      test: ["CMD", "sh", "-c", "redis-cli -a ${REDIS_PASSWORD} --no-auth-warning ping"]
+      test: ["CMD-SHELL", "redis-cli -a $$REDIS_PASSWORD --no-auth-warning ping"]
       timeout: 5s
     image: redis:8.4-alpine
     logging:

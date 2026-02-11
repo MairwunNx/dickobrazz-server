@@ -11,8 +11,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     bash \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd --gid 1000 devuser \
-    && useradd --uid 1000 --gid devuser --shell /bin/bash --create-home devuser
+RUN if ! getent group 1000 >/dev/null 2>&1; then groupadd --gid 1000 devuser; \
+    elif [ "$(getent group 1000 | cut -d: -f1)" != "devuser" ]; then groupmod -n devuser $(getent group 1000 | cut -d: -f1); fi \
+    && if ! id -u 1000 >/dev/null 2>&1; then useradd --uid 1000 --gid 1000 --shell /bin/bash --create-home devuser; \
+    elif [ "$(id -un 1000)" != "devuser" ]; then usermod -l devuser -d /home/devuser -m -s /bin/bash $(id -un 1000); fi
 
 USER devuser
 

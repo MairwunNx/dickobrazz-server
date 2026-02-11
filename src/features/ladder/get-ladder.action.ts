@@ -84,7 +84,7 @@ export const createGetLadderAction =
     return {
       leaders,
       total_participants: totalParticipants,
-      user_position: userPosition ?? undefined,
+      user_position: userPosition,
       neighborhood,
       page: createPageMeta(limit, totalParticipants, page),
     };

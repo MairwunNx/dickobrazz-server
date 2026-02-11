@@ -16,7 +16,7 @@ export const UserNeighborhoodSchema = z.object({
 export const CockLadderResponseSchema = z.object({
   leaders: LeaderboardEntrySchema.array(),
   total_participants: z.number(),
-  user_position: z.number().nullable().optional(),
+  user_position: z.number().nullable(),
   neighborhood: UserNeighborhoodSchema,
   page: PageMetaSchema,
 });

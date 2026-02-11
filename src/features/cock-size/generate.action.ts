@@ -3,7 +3,7 @@ import type { CockDal } from "@/entities/cock";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
 import { computeHash } from "@/shared/lib/crypto";
-import { getMoscowDate, getTtlToMoscowMidnight } from "@/shared/lib/datetime";
+import { getTtlToMoscowMidnight, moscowNow, toDate } from "@/shared/lib/datetime";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { Random } from "@/shared/lib/random";
@@ -36,7 +36,7 @@ export const createGenerateSizeAction = (cockDal: CockDal, redis: RedisClient, r
     size,
     nickname,
     user_id: userId,
-    requested_at: getMoscowDate(),
+    requested_at: toDate(moscowNow()),
   });
 
   const salt = crypto.randomUUID();

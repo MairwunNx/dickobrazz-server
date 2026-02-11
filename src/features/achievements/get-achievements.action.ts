@@ -2,7 +2,7 @@ import type { AchievementDal, AchievementDoc } from "@/entities/achievement";
 import type { CockDal } from "@/entities/cock";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
-import { getMoscowDate, isSameDay, toMoscowDate } from "@/shared/lib/datetime";
+import { fromDate, isSameMoscowDay, moscowNow, toDate } from "@/shared/lib/datetime";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { AchBulkResult } from "./db/pipelines";
@@ -16,20 +16,19 @@ export const createGetAchievementsAction = (cockDal: CockDal, achievementDal: Ac
   const getAchievements = async (): Promise<CockAchievementsResponse> => {
     const ticker = createTicker();
     const userId = getAuthUser().id;
-    const now = getMoscowDate();
+    const now = toDate(moscowNow());
 
     const userAchievements = await achievementDal.findByUserId(userId);
 
     if (userAchievements.length > 0) {
       const lastChecked = (userAchievements[0] as AchievementDoc).last_checked_at;
-      if (lastChecked && isSameDay(lastChecked, now)) {
+      if (lastChecked && isSameMoscowDay(lastChecked, now)) {
         logger.info("Achievements from cache", { service: "cocks", operation: "getAchievements", user_id: userId, duration_ms: ticker() });
         return formatResponse(userAchievements);
       }
     }
 
-    const thirtyOneDaysAgo = new Date(now);
-    thirtyOneDaysAgo.setDate(thirtyOneDaysAgo.getDate() - 31);
+    const thirtyOneDaysAgo = toDate(fromDate(now).subtract({ days: 31 }));
 
     const [bulkResults, lightningResult, seasonResult] = await Promise.all([
       cockDal.aggregate<AchBulkResult>(pAchBulk(userId, thirtyOneDaysAgo)),
@@ -232,10 +231,10 @@ const checkRecent3 = (recent3: { size: number; requested_at: Date }[], update: U
     update("leet_speak", true, 1);
   }
 
-  const moscowTime = toMoscowDate(r2.requested_at);
-  const hour = moscowTime.getHours();
-  const minute = moscowTime.getMinutes();
-  const day = moscowTime.getDate();
+  const moscow = fromDate(r2.requested_at);
+  const hour = moscow.hour;
+  const minute = moscow.minute;
+  const day = moscow.day;
 
   if (minute === r2.size) update("minute_precision", true, 1);
   if (hour === r2.size) update("hour_precision", true, 1);

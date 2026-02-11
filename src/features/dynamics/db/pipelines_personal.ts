@@ -34,22 +34,39 @@ export interface PersonalGrowthSpeedResult {
 }
 
 /**
- * Один полный скан коллекции: user_total, user_count, IRK, доминирование.
+ * Один полный скан коллекции: user_total, user_count, IRK, доминирование (перцентильный ранг).
  * Заменяет 4 отдельных пайплайна (pUserTotal, pUserCocksCount, pIrk, pDominance).
+ * dominance = "ты выше X% игроков" через $percentRank по суммарному размеру.
  */
 export const pPersonalTotalsAndRatios = (userId: number): PipelineStage[] => [
   {
     $group: {
+      _id: "$user_id",
+      total: { $sum: "$size" },
+      count: { $sum: 1 },
+    },
+  },
+  {
+    $setWindowFields: {
+      sortBy: { total: 1 },
+      output: {
+        percentile_rank: { $percentRank: {} } as unknown,
+      },
+    },
+  } as PipelineStage,
+  {
+    $group: {
       _id: null,
-      global_total: { $sum: "$size" },
+      global_total: { $sum: "$total" },
       user_total: {
-        $sum: {
-          $cond: [{ $eq: ["$user_id", userId] }, "$size", 0],
-        },
+        $sum: { $cond: [{ $eq: ["$_id", userId] }, "$total", 0] },
       },
       user_count: {
-        $sum: {
-          $cond: [{ $eq: ["$user_id", userId] }, 1, 0],
+        $sum: { $cond: [{ $eq: ["$_id", userId] }, "$count", 0] },
+      },
+      user_dominance: {
+        $max: {
+          $cond: [{ $eq: ["$_id", userId] }, "$percentile_rank", null],
         },
       },
     },
@@ -87,18 +104,7 @@ export const pPersonalTotalsAndRatios = (userId: number): PipelineStage[] => [
       dominance: {
         $round: [
           {
-            $multiply: [
-              {
-                $cond: [
-                  { $eq: ["$global_total", 0] },
-                  0,
-                  {
-                    $divide: ["$user_total", "$global_total"],
-                  },
-                ],
-              },
-              100,
-            ],
+            $multiply: [{ $ifNull: ["$user_dominance", 0] }, 100],
           },
           1,
         ],

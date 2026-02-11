@@ -42,9 +42,8 @@ export interface PersonalGrowthSpeedResult {
 // ===========================================
 
 /**
- * Один полный скан коллекции: user_total, user_count, IRK, доминирование (перцентильный ранг).
- * Заменяет 4 отдельных пайплайна (pUserTotal, pUserCocksCount, pIrk, pDominance).
- * dominance = "ты выше X% игроков" через $percentRank по суммарному размеру.
+ * Один полный скан коллекции: user_total, user_count, IRK, dominance (перцентильный ранг).
+ * dominance = «ты выше X% игроков» через $percentRank по суммарному размеру.
  */
 export const pPersonalTotalsAndRatios = (userId: number): PipelineStage[] => [
   {
@@ -122,9 +121,9 @@ export const pPersonalTotalsAndRatios = (userId: number): PipelineStage[] => [
 ];
 
 /**
- * Facet по последним 5 кокам юзера: recent_average, daily_growth,
- * daily_dynamics, five_cocks_dynamics, luck_coefficient, volatility.
- * Заменяет 6 отдельных пайплайнов одним запросом.
+ * Facet по последним 5 кокам пользователя: recent (avg), daily_growth,
+ * daily_dynamics (изменение последний/предпоследний), five_cocks (изменение за 5),
+ * luck_coefficient (avg/30.5), volatility (стандартное отклонение).
  */
 export const pPersonalLast5Facet = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
@@ -316,10 +315,7 @@ export const pPersonalLast5Facet = (userId: number): PipelineStage[] => [
   },
 ];
 
-/**
- * Рекорд юзера + дата первого кока в одном $facet.
- * Заменяет 2 отдельных пайплайна.
- */
+/** Рекорд пользователя (размер + дата) и дата первого кока в одном $facet. */
 export const pPersonalRecordAndDates = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
   {
@@ -330,9 +326,7 @@ export const pPersonalRecordAndDates = (userId: number): PipelineStage[] => [
   },
 ];
 
-/**
- * Скорость роста юзера: средний размер за день (последние 5 дней).
- */
+/** Средний размер за день за последние 5 дней пользователя. */
 export const pPersonalGrowthSpeed = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
   { $sort: { requested_at: 1 } },

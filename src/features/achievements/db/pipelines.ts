@@ -34,6 +34,7 @@ export interface AchBulkResult {
 // Пайплайны
 // ===========================================
 
+/** Подсчёт эпизодов «молнии» — скачок размера ≥50 между двумя соседними измерениями по времени. */
 export const pAchLightning = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
   { $sort: { requested_at: 1 } },
@@ -48,6 +49,7 @@ export const pAchLightning = (userId: number): PipelineStage[] => [
   { $count: "count" },
 ];
 
+/** Подсчёт количества календарных сезонов (3 мес), в которых пользователь стягивал хотя бы один кок. */
 export const pCountSeasons = (userId: number): PipelineStage[] => [
   { $group: { _id: null, first_cock_date: { $min: "$requested_at" } } },
   {
@@ -82,6 +84,13 @@ export const pCountSeasons = (userId: number): PipelineStage[] => [
   { $count: "count" },
 ];
 
+/**
+ * Один $facet для всех базовых метрик достижений: totalPulls, totalSize, min/max,
+ * sniper30, halfHundred50, maximalist61, beautifulNumbers, traveler, moscovite,
+ * recent10, recent3, last31, earlyBird, speedrunner, midnightPuller, valentine,
+ * newYearGift, mensSolidarity, friday13th, leapCock.
+ * moscoviteStartDate — начало учёта для moscovite (размер 50 после даты).
+ */
 export const pAchBulk = (userId: number, moscoviteStartDate: Date): PipelineStage[] => [
   { $match: { user_id: userId } },
   {

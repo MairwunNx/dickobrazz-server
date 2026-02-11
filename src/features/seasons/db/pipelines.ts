@@ -14,6 +14,7 @@ export interface AggWinner {
 // Пайплайны
 // ===========================================
 
+/** Топ-3 победителя сезона по суммарному размеру. */
 export const pSeasonWinners = (startDate: Date, endDate: Date): PipelineStage[] => [
   { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
   { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
@@ -21,12 +22,14 @@ export const pSeasonWinners = (startDate: Date, endDate: Date): PipelineStage[] 
   { $limit: 3 },
 ];
 
+/** Количество уникальных пользователей, участвовавших в сезоне. */
 export const pSeasonCockersCount = (startDate: Date, endDate: Date): PipelineStage[] => [
   { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
   { $group: { _id: "$user_id" } },
   { $count: "total" },
 ];
 
+/** Позиция пользователя в сезоне (1-based). */
 export const pUserPositionInSeason = (userId: number, startDate: Date, endDate: Date): PipelineStage[] => [
   { $match: { requested_at: { $gte: startDate, $lt: endDate } } },
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
@@ -37,6 +40,7 @@ export const pUserPositionInSeason = (userId: number, startDate: Date, endDate: 
   { $project: { _id: 0, position: { $add: ["$position", 1] } } },
 ];
 
+/** Окно из 3 позиций вокруг указанной в сезоне (соседи). */
 export const pNeighborhoodInSeason = (position: number, startDate: Date, endDate: Date): PipelineStage[] => {
   const skip = Math.max(position - 2, 0);
   return [
@@ -48,6 +52,7 @@ export const pNeighborhoodInSeason = (position: number, startDate: Date, endDate
   ];
 };
 
+/** Дата первого кока в коллекции (начало истории). */
 export const pFirstCockDate = (): PipelineStage[] => [{ $sort: { requested_at: 1 } }, { $limit: 1 }, { $project: { _id: 0, first_date: "$requested_at" } }];
 
 interface CompletedSeasonRange {

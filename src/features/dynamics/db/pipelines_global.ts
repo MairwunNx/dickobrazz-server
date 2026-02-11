@@ -21,6 +21,11 @@ export type { GlobalDynamicsRaw };
 // Пайплайны
 // ===========================================
 
+/**
+ * Один $facet для глобальной статистики: totals, uniqueUsers,
+ * recentAndDistribution (avg/median + huge/little %), record (рекордный день),
+ * growthSpeed (средний размер за день за последние 5 дней).
+ */
 export const pGlobalDynamics = (): PipelineStage[] => [
   {
     $facet: {

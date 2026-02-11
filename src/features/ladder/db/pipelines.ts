@@ -28,7 +28,7 @@ export interface AggUserContext {
 // Пайплайны
 // ===========================================
 
-/** Один скан: leaders (с пагинацией) + total count через $facet */
+/** Лидерборд all-time: список лидеров с пагинацией + общее количество участников через $facet. */
 export const pLeadersAndCount = (limit: number, page: number): PipelineStage[] => [
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
   { $sort: { total_size: -1 as const } },
@@ -40,7 +40,7 @@ export const pLeadersAndCount = (limit: number, page: number): PipelineStage[] =
   },
 ];
 
-/** Один скан: позиция юзера + соседи через $setWindowFields ($rank + $shift) */
+/** Позиция пользователя в leaderboard + соседи сверху/снизу через $setWindowFields ($rank + $shift). */
 export const pUserContext = (userId: number): PipelineStage[] => [
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
   {

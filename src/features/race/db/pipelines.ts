@@ -30,7 +30,7 @@ export interface AggUserContext {
 
 const dateMatch = (startDate?: Date, endDate?: Date): PipelineStage[] => (startDate && endDate ? [{ $match: { requested_at: { $gte: startDate, $lt: endDate } } }] : []);
 
-/** Один скан: leaders (с пагинацией) + total count через $facet. Без дат — all-time. */
+/** Лидерборд за период или all-time: leaders с пагинацией + total. Без дат — all-time. */
 export const pRaceLeadersAndCount = (limit: number, page: number, startDate?: Date, endDate?: Date): PipelineStage[] => [
   ...dateMatch(startDate, endDate),
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
@@ -43,7 +43,7 @@ export const pRaceLeadersAndCount = (limit: number, page: number, startDate?: Da
   },
 ];
 
-/** Один скан: позиция юзера + соседи через $setWindowFields ($rank + $shift). Без дат — all-time. */
+/** Позиция пользователя в race + соседи сверху/снизу. Без дат — all-time. */
 export const pRaceUserContext = (userId: number, startDate?: Date, endDate?: Date): PipelineStage[] => [
   ...dateMatch(startDate, endDate),
   { $group: { _id: "$user_id", total_size: { $sum: "$size" } } },
@@ -62,4 +62,5 @@ export const pRaceUserContext = (userId: number, startDate?: Date, endDate?: Dat
   { $match: { _id: userId } },
 ];
 
+/** Дата первого кока в коллекции (начало истории). */
 export const pFirstCockDate = (): PipelineStage[] => [{ $sort: { requested_at: 1 as const } }, { $limit: 1 }, { $project: { _id: 0, first_date: "$requested_at" } }];

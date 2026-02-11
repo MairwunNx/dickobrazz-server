@@ -13,11 +13,6 @@ export const createUserDal = () => {
         .lean<UserDoc[]>()
         .exec(),
 
-    create: (data: Omit<UserDoc, "updated_at">) => model.create({ ...data, updated_at: new Date() }),
-
-    upsert: (userId: number, data: Partial<UserDoc>) =>
-      model.findOneAndUpdate({ user_id: userId }, { $set: { ...data, updated_at: new Date() } }, { upsert: true, new: true, lean: true }).exec(),
-
     updatePrivacy: (userId: number, isHidden: boolean) =>
       model.findOneAndUpdate({ user_id: userId }, { $set: { is_hidden: isHidden, updated_at: new Date() } }, { new: true, lean: true }).exec(),
 

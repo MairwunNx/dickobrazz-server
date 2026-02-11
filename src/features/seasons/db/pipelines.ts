@@ -1,10 +1,18 @@
 import type { PipelineStage } from "mongoose";
 
+// ===========================================
+// Результаты агрегаций
+// ===========================================
+
 export interface AggWinner {
   _id: number;
   total_size: number;
   nickname: string;
 }
+
+// ===========================================
+// Пайплайны
+// ===========================================
 
 export const pSeasonWinners = (startDate: Date, endDate: Date): PipelineStage[] => [
   { $match: { requested_at: { $gte: startDate, $lt: endDate } } },

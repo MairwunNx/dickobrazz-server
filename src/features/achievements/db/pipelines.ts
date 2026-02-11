@@ -2,6 +2,38 @@ import type { PipelineStage } from "mongoose";
 
 const tz = "Europe/Moscow";
 
+// ===========================================
+// Результаты агрегаций
+// ===========================================
+
+export interface AchBulkResult {
+  totalPulls: { count: number }[];
+  totalSize: { total: number }[];
+  maxSize: { max: number }[];
+  minSize: { min: number }[];
+  sniper30: { count: number }[];
+  halfHundred50: { count: number }[];
+  maximalist61: { count: number }[];
+  beautifulNumbers: { count: number }[];
+  traveler: { unique_sizes: number }[];
+  moscovite: { count: number }[];
+  recent10: { size: number }[];
+  recent3: { size: number; requested_at: Date }[];
+  last31: { size: number }[];
+  earlyBird: { count: number }[];
+  speedrunner: { count: number }[];
+  midnightPuller: { count: number }[];
+  valentine: { count: number }[];
+  newYearGift: { count: number }[];
+  mensSolidarity: { count: number }[];
+  friday13th: { count: number }[];
+  leapCock: { count: number }[];
+}
+
+// ===========================================
+// Пайплайны
+// ===========================================
+
 export const pAchLightning = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
   { $sort: { requested_at: 1 } },
@@ -49,30 +81,6 @@ export const pCountSeasons = (userId: number): PipelineStage[] => [
   { $unwind: "$seasons" },
   { $count: "count" },
 ];
-
-export interface AchBulkResult {
-  totalPulls: { count: number }[];
-  totalSize: { total: number }[];
-  maxSize: { max: number }[];
-  minSize: { min: number }[];
-  sniper30: { count: number }[];
-  halfHundred50: { count: number }[];
-  maximalist61: { count: number }[];
-  beautifulNumbers: { count: number }[];
-  traveler: { unique_sizes: number }[];
-  moscovite: { count: number }[];
-  recent10: { size: number }[];
-  recent3: { size: number; requested_at: Date }[];
-  last31: { size: number }[];
-  earlyBird: { count: number }[];
-  speedrunner: { count: number }[];
-  midnightPuller: { count: number }[];
-  valentine: { count: number }[];
-  newYearGift: { count: number }[];
-  mensSolidarity: { count: number }[];
-  friday13th: { count: number }[];
-  leapCock: { count: number }[];
-}
 
 export const pAchBulk = (userId: number, moscoviteStartDate: Date): PipelineStage[] => [
   { $match: { user_id: userId } },

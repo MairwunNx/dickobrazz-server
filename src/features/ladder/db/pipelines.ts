@@ -1,5 +1,9 @@
 import type { PipelineStage } from "mongoose";
 
+// ===========================================
+// Результаты агрегаций
+// ===========================================
+
 export interface AggLeader {
   _id: number;
   total_size: number;
@@ -19,6 +23,10 @@ export interface AggUserContext {
   below_id: number | null;
   below_size: number | null;
 }
+
+// ===========================================
+// Пайплайны
+// ===========================================
 
 /** Один скан: leaders (с пагинацией) + total count через $facet */
 export const pLeadersAndCount = (limit: number, page: number): PipelineStage[] => [
@@ -48,10 +56,4 @@ export const pUserContext = (userId: number): PipelineStage[] => [
     },
   },
   { $match: { _id: userId } },
-];
-
-/** Суммарный размер кока юзера */
-export const pUserTotalSize = (userId: number): PipelineStage[] => [
-  { $match: { user_id: userId } },
-  { $group: { _id: "$user_id", total_size: { $sum: "$size" }, nickname: { $first: "$nickname" } } },
 ];

@@ -3,6 +3,10 @@ import type { PipelineStage } from "mongoose";
 const tz = "Europe/Moscow";
 const HUGE_COCK_THRESHOLD = 19;
 
+// ===========================================
+// Результаты агрегаций
+// ===========================================
+
 interface GlobalDynamicsRaw {
   totals: [{ total_size: number; total_count: number }] | [];
   uniqueUsers: [{ count: number }] | [];
@@ -12,6 +16,10 @@ interface GlobalDynamicsRaw {
 }
 
 export type { GlobalDynamicsRaw };
+
+// ===========================================
+// Пайплайны
+// ===========================================
 
 export const pGlobalDynamics = (): PipelineStage[] => [
   {

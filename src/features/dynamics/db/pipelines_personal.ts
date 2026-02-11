@@ -2,6 +2,10 @@ import type { PipelineStage } from "mongoose";
 
 const tz = "Europe/Moscow";
 
+// ===========================================
+// Результаты агрегаций
+// ===========================================
+
 export interface PersonalTotalsAndRatiosResult {
   user_total: number;
   user_count: number;
@@ -32,6 +36,10 @@ export interface PersonalRecordAndDatesResult {
 export interface PersonalGrowthSpeedResult {
   growth_speed: number;
 }
+
+// ===========================================
+// Пайплайны
+// ===========================================
 
 /**
  * Один полный скан коллекции: user_total, user_count, IRK, доминирование (перцентильный ранг).

@@ -1,5 +1,9 @@
 import type { PipelineStage } from "mongoose";
 
+// ===========================================
+// Результаты агрегаций
+// ===========================================
+
 export interface AggLeader {
   _id: number;
   total_size: number;
@@ -19,6 +23,10 @@ export interface AggUserContext {
   below_id: number | null;
   below_size: number | null;
 }
+
+// ===========================================
+// Пайплайны
+// ===========================================
 
 const dateMatch = (startDate?: Date, endDate?: Date): PipelineStage[] => (startDate && endDate ? [{ $match: { requested_at: { $gte: startDate, $lt: endDate } } }] : []);
 

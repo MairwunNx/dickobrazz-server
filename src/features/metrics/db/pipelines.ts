@@ -1,5 +1,9 @@
 import type { PipelineStage } from "mongoose";
 
+// ===========================================
+// Пайплайны (типы результатов — примитивные, без отдельной секции)
+// ===========================================
+
 export const pActiveUsersSince = (since: Date): PipelineStage[] => [{ $match: { requested_at: { $gte: since } } }, { $group: { _id: "$user_id" } }, { $count: "total" }];
 
 export const pSizeDistribution = (): PipelineStage[] => [

@@ -1,0 +1,768 @@
+openapi: 3.0.3
+info:
+  title: Dickobrazz API
+  description: Backend API для Dickobrazz (dickobrazz.com) — Telegram бот с daily size, leaderboards, seasons, achievements.
+  version: 0.0.3
+
+servers:
+  - url: http://localhost:3030
+    description: Local development
+
+tags:
+  - name: Health
+    description: Health check и метрики
+  - name: Auth
+    description: Авторизация
+  - name: Profile
+    description: Профиль пользователя
+  - name: Cock
+    description: Размер, лидерборды, dynamics, achievements
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: getHealth
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /metrics:
+    get:
+      tags: [Health]
+      summary: Prometheus метрики
+      operationId: getMetrics
+      responses:
+        "200":
+          description: Prometheus text format
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Вход через Telegram Init Data
+      operationId: postAuthLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelegramAuthPayload"
+      responses:
+        "200":
+          description: Успешная авторизация
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthDataResponse"
+
+  /api/v1/me:
+    get:
+      tags: [Profile]
+      summary: Получить профиль текущего пользователя
+      operationId: getMe
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - csotAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/me/privacy:
+    patch:
+      tags: [Profile]
+      summary: Обновить настройки приватности
+      operationId: patchMePrivacy
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - csotAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePrivacyPayload"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileDataResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/cock/size:
+    post:
+      tags: [Cock]
+      summary: Стянуть кокич
+      operationId: postCockSize
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - csotAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockSizeDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/cock/ruler:
+    get:
+      tags: [Cock]
+      summary: Дейли-топ лидерборд (кок-рулетка)
+      operationId: getCockRuler
+      parameters:
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/PageParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockRulerDataResponse"
+
+  /api/v1/cock/race:
+    get:
+      tags: [Cock]
+      summary: Гонка коков (лидерборд сезона)
+      operationId: getCockRace
+      parameters:
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/PageParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockRaceDataResponse"
+
+  /api/v1/cock/dynamic/global:
+    get:
+      tags: [Cock]
+      summary: Общая динамика коков
+      operationId: getCockDynamicGlobal
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockDynamicGlobalDataResponse"
+
+  /api/v1/cock/dynamic/personal:
+    get:
+      tags: [Cock]
+      summary: Персональная динамика коков
+      operationId: getCockDynamicPersonal
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - csotAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockDynamicIndividualDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/cock/achievements:
+    get:
+      tags: [Cock]
+      summary: Достижения пользователя
+      operationId: getCockAchievements
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - csotAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockAchievementsDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/cock/ladder:
+    get:
+      tags: [Cock]
+      summary: Ладдер коков, общий лидерборд
+      operationId: getCockLadder
+      parameters:
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/PageParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockLadderDataResponse"
+
+  /api/v1/cock/seasons:
+    get:
+      tags: [Cock]
+      summary: Сезоны, список и победители
+      operationId: getCockSeasons
+      parameters:
+        - $ref: "#/components/parameters/LimitParam"
+        - $ref: "#/components/parameters/PageParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CockSeasonsDataResponse"
+
+  /api/v1/cock/respects:
+    get:
+      tags: [Cock]
+      summary: Кок-респекты, детализация респектов за сезоны и ачивки
+      operationId: getCockRespects
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+        - csotAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RespectDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_token
+      description: Сессионная кука после логина
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Сессионный токен в заголовке Authorization
+    csotAuth:
+      type: apiKey
+      in: header
+      name: x-internal-token
+      description: |
+        CSOT токен для межсерверной авторизации.
+        Опционально: x-internal-user-id (integer) — ID пользователя, x-internal-user-name (string) — имя.
+
+  parameters:
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 13
+        maximum: 50
+      description: Лимит записей на странице
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+      description: Номер страницы
+
+  responses:
+    Unauthorized:
+      description: Требуется авторизация
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIErrorResponse"
+        example:
+          error:
+            message: "Authentication required"
+            code: "AUTH_REQUIRED"
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/APIErrorResponse"
+
+  schemas:
+    APIErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            code:
+              type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, down]
+        version:
+          type: string
+        uptime_sec:
+          type: number
+        checks:
+          type: object
+          properties:
+            mongo:
+              type: string
+              enum: [ok, degraded, down]
+            redis:
+              type: string
+              enum: [ok, degraded, down]
+
+    TelegramAuthPayload:
+      type: object
+      required: [id, first_name, auth_date, hash]
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        username:
+          type: string
+        photo_url:
+          type: string
+        auth_date:
+          type: integer
+        hash:
+          type: string
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        photo_url:
+          type: string
+        is_hidden:
+          type: boolean
+
+    AuthDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/UserProfile"
+            session_token:
+              type: string
+
+    UserProfileDataResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/UserProfile"
+
+    UpdatePrivacyPayload:
+      type: object
+      required: [is_hidden]
+      properties:
+        is_hidden:
+          type: boolean
+
+    CockSizeDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            size:
+              type: integer
+            hash:
+              type: string
+            salt:
+              type: string
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        nickname:
+          type: string
+        size:
+          type: integer
+
+    UserNeighborhood:
+      type: object
+      properties:
+        above:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+        self:
+          $ref: "#/components/schemas/LeaderboardEntry"
+        below:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+
+    PageMeta:
+      type: object
+      properties:
+        limit:
+          type: integer
+        page:
+          type: integer
+        total:
+          type: integer
+        total_pages:
+          type: integer
+
+    CockRulerDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            leaders:
+              type: array
+              items:
+                $ref: "#/components/schemas/LeaderboardEntry"
+            total_participants:
+              type: integer
+            user_position:
+              type: integer
+              nullable: true
+            neighborhood:
+              $ref: "#/components/schemas/UserNeighborhood"
+            page:
+              $ref: "#/components/schemas/PageMeta"
+
+    RaceEntry:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        nickname:
+          type: string
+        total_size:
+          type: integer
+
+    RaceNeighborhood:
+      type: object
+      properties:
+        above:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaceEntry"
+        self:
+          $ref: "#/components/schemas/RaceEntry"
+        below:
+          type: array
+          items:
+            $ref: "#/components/schemas/RaceEntry"
+
+    SeasonInfo:
+      type: object
+      properties:
+        season_num:
+          type: integer
+        start_date:
+          type: string
+        end_date:
+          type: string
+        is_active:
+          type: boolean
+
+    CockRaceDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            season:
+              $ref: "#/components/schemas/SeasonInfo"
+            leaders:
+              type: array
+              items:
+                $ref: "#/components/schemas/RaceEntry"
+            total_participants:
+              type: integer
+            user_position:
+              type: integer
+              nullable: true
+            neighborhood:
+              $ref: "#/components/schemas/RaceNeighborhood"
+            page:
+              $ref: "#/components/schemas/PageMeta"
+
+    CockDynamicRecentStat:
+      type: object
+      properties:
+        average:
+          type: number
+        median:
+          type: number
+
+    CockDynamicPercentile:
+      type: object
+      properties:
+        huge_percent:
+          type: number
+        little_percent:
+          type: number
+
+    CockDynamicRecord:
+      type: object
+      properties:
+        requested_at:
+          type: string
+          nullable: true
+        total:
+          type: integer
+
+    CockDynamicOverall:
+      type: object
+      properties:
+        total_size:
+          type: integer
+        unique_users:
+          type: integer
+        recent:
+          $ref: "#/components/schemas/CockDynamicRecentStat"
+        distribution:
+          $ref: "#/components/schemas/CockDynamicPercentile"
+        record:
+          $ref: "#/components/schemas/CockDynamicRecord"
+        total_cocks_count:
+          type: integer
+        growth_speed:
+          type: number
+
+    CockDynamicGlobalDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            overall:
+              $ref: "#/components/schemas/CockDynamicOverall"
+
+    CockDynamicDailyDynamics:
+      type: object
+      properties:
+        yesterday_cock_change:
+          type: number
+        yesterday_cock_change_percent:
+          type: number
+
+    CockDynamicFiveCocksDynamics:
+      type: object
+      properties:
+        five_cocks_change:
+          type: number
+        five_cocks_change_percent:
+          type: number
+
+    CockDynamicIndividual:
+      type: object
+      properties:
+        total_size:
+          type: integer
+        recent_average:
+          type: number
+        irk:
+          type: number
+        record:
+          $ref: "#/components/schemas/CockDynamicRecord"
+        dominance:
+          type: number
+        daily_growth_average:
+          type: number
+        daily_dynamics:
+          $ref: "#/components/schemas/CockDynamicDailyDynamics"
+        five_cocks_dynamics:
+          $ref: "#/components/schemas/CockDynamicFiveCocksDynamics"
+        growth_speed:
+          type: number
+        first_cock_date:
+          type: string
+          nullable: true
+        luck_coefficient:
+          type: number
+        volatility:
+          type: number
+        cocks_count:
+          type: integer
+
+    CockDynamicIndividualDataResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/CockDynamicIndividual"
+
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: string
+        emoji:
+          type: string
+        respects:
+          type: integer
+        completed:
+          type: boolean
+        progress:
+          type: integer
+        max_progress:
+          type: integer
+
+    CockAchievementsDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            achievements:
+              type: array
+              items:
+                $ref: "#/components/schemas/Achievement"
+            achievements_total:
+              type: integer
+            achievements_done:
+              type: integer
+            achievements_done_percent:
+              type: number
+
+    CockLadderDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            leaders:
+              type: array
+              items:
+                $ref: "#/components/schemas/LeaderboardEntry"
+            total_participants:
+              type: integer
+            user_position:
+              type: integer
+              nullable: true
+            neighborhood:
+              $ref: "#/components/schemas/UserNeighborhood"
+            page:
+              $ref: "#/components/schemas/PageMeta"
+
+    SeasonWinner:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        nickname:
+          type: string
+        total_size:
+          type: integer
+        place:
+          type: integer
+
+    SeasonNeighborhood:
+      type: object
+      properties:
+        above:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeasonWinner"
+        self:
+          $ref: "#/components/schemas/SeasonWinner"
+        below:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeasonWinner"
+
+    SeasonWithWinners:
+      allOf:
+        - $ref: "#/components/schemas/SeasonInfo"
+        - type: object
+          properties:
+            winners:
+              type: array
+              items:
+                $ref: "#/components/schemas/SeasonWinner"
+            total_participants:
+              type: integer
+            user_position:
+              type: integer
+              nullable: true
+            neighborhood:
+              $ref: "#/components/schemas/SeasonNeighborhood"
+
+    CockSeasonsDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            seasons:
+              type: array
+              items:
+                $ref: "#/components/schemas/SeasonWithWinners"
+            page:
+              $ref: "#/components/schemas/PageMeta"
+            user_season_wins:
+              type: integer
+
+    RespectDataResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            season_respect:
+              type: number
+            achievement_respect:
+              type: number
+            total_respect:
+              type: number

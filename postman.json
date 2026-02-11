@@ -1,0 +1,388 @@
+{
+  "info": {
+    "name": "Dickobrazz API",
+    "description": "Backend API для Dickobrazz. Авторизация через CSOT: задай `csot_token`, `x_internal_user_id`, `x_internal_user_name` в variables. Для защищённых ручек заголовки обязательны, для остальных — опциональны (можно включить для персональных данных).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3030"
+    },
+    {
+      "key": "csot_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "x_internal_user_id",
+      "value": "12345",
+      "type": "string"
+    },
+    {
+      "key": "x_internal_user_name",
+      "value": "Test",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "description": "Health check и метрики",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/health",
+            "description": "Проверка состояния сервиса"
+          }
+        },
+        {
+          "name": "Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/metrics",
+            "description": "Prometheus метрики"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "description": "Авторизация",
+      "item": [
+        {
+          "name": "Вход (Telegram)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 12345,\n  \"first_name\": \"Test\",\n  \"auth_date\": 1234567890,\n  \"hash\": \"...\"\n}"
+            },
+            "url": "{{base_url}}/auth/login",
+            "description": "Вход через Telegram Init Data"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile (protected)",
+      "description": "Профиль пользователя. Требует авторизации.",
+      "item": [
+        {
+          "name": "Получить профиль",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/me",
+            "description": "Получить профиль текущего пользователя"
+          }
+        },
+        {
+          "name": "Обновить приватность",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_hidden\": false\n}"
+            },
+            "url": "{{base_url}}/api/v1/me/privacy",
+            "description": "Обновить настройки приватности"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cock",
+      "description": "Размер, лидерборды, dynamics, achievements",
+      "item": [
+        {
+          "name": "Размер (protected)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/size",
+            "description": "Сгенерировать новый размер"
+          }
+        },
+        {
+          "name": "Ruler",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/ruler?limit=20&page=1",
+            "description": "Лидерборд текущего размера. Заголовки опциональны — включи для user_position и neighborhood."
+          }
+        },
+        {
+          "name": "Race",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/race?limit=20&page=1",
+            "description": "Лидерборд сезона. Заголовки опциональны."
+          }
+        },
+        {
+          "name": "Dynamic Global",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/dynamic/global",
+            "description": "Глобальная динамика. Заголовки опциональны."
+          }
+        },
+        {
+          "name": "Dynamic Personal (protected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/dynamic/personal",
+            "description": "Персональная динамика"
+          }
+        },
+        {
+          "name": "Achievements (protected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/achievements",
+            "description": "Достижения пользователя"
+          }
+        },
+        {
+          "name": "Ladder",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/ladder?limit=20&page=1",
+            "description": "Общий лидерборд. Заголовки опциональны."
+          }
+        },
+        {
+          "name": "Seasons",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/seasons?limit=20&page=1",
+            "description": "История сезонов. Заголовки опциональны."
+          }
+        },
+        {
+          "name": "Respects (protected)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-internal-token",
+                "value": "{{csot_token}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-id",
+                "value": "{{x_internal_user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "x-internal-user-name",
+                "value": "{{x_internal_user_name}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{base_url}}/api/v1/cock/respects",
+            "description": "Кок-респекты юзака"
+          }
+        }
+      ]
+    }
+  ]
+}

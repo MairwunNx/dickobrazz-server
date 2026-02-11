@@ -10,9 +10,7 @@ export const createAchievementDal = () => {
     findByUserAndAchievement: (userId: number, achievementId: string) => model.findOne({ user_id: userId, achievement_id: achievementId }).lean<AchievementDoc>().exec(),
 
     upsert: (userId: number, achievementId: string, data: Partial<AchievementDoc>) =>
-      model
-        .findOneAndUpdate({ user_id: userId, achievement_id: achievementId }, { $set: { ...data, last_checked_at: new Date() } }, { upsert: true, new: true, lean: true })
-        .exec(),
+      model.findOneAndUpdate({ user_id: userId, achievement_id: achievementId }, { $set: data }, { upsert: true, new: true, lean: true }).exec(),
 
     syncIndexes: () => model.syncIndexes(),
   };

@@ -1,1 +1,1 @@
-export { formatMoscowISO, getMoscowDate, getMoscowDayEnd, getMoscowDayStart, getTtlToMoscowMidnight, isSameDay } from "./datetime";
+export { formatMoscowISO, getMoscowDate, getMoscowDayEnd, getMoscowDayStart, getTtlToMoscowMidnight, isSameDay, toMoscowDate } from "./datetime";

@@ -1,8 +1,8 @@
 const MOSCOW_TZ = "Europe/Moscow";
 
-export const getMoscowDate = (): Date => {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
-};
+export const toMoscowDate = (date: Date): Date => new Date(date.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
+
+export const getMoscowDate = (): Date => toMoscowDate(new Date());
 
 export const getMoscowDayStart = (): Date => {
   const moscowDate = getMoscowDate();

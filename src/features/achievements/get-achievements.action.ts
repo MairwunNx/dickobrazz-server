@@ -1,4 +1,5 @@
 import type { AchievementDal, AchievementDoc } from "@/entities/achievement";
+import { ALL_ACHIEVEMENTS } from "@/entities/achievement/lib/catalog";
 import type { CockDal } from "@/entities/cock";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
@@ -7,7 +8,6 @@ import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { AchBulkResult } from "./db/pipelines";
 import { pAchBulk, pAchLightning, pCountSeasons } from "./db/pipelines";
-import { ALL_ACHIEVEMENTS } from "./lib/catalog";
 import type { CockAchievementsResponse } from "./types";
 
 const val = <T extends Record<string, unknown>>(arr: T[], key: keyof T, fallback = 0): number => (arr[0]?.[key] as number) ?? fallback;

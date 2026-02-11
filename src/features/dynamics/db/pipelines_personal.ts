@@ -43,7 +43,7 @@ export interface PersonalGrowthSpeedResult {
 
 /**
  * Один полный скан коллекции: user_total, user_count, IRK, dominance (перцентильный ранг).
- * dominance = «ты выше X% игроков» через $percentRank по суммарному размеру.
+ * dominance = «ты выше X% игроков» через $rank / кол-во игроков.
  */
 export const pPersonalTotalsAndRatios = (userId: number): PipelineStage[] => [
   {
@@ -57,10 +57,24 @@ export const pPersonalTotalsAndRatios = (userId: number): PipelineStage[] => [
     $setWindowFields: {
       sortBy: { total: 1 },
       output: {
-        percentile_rank: { $percentRank: {} } as unknown,
+        rank: { $rank: {} },
+        total_users: { $count: {} },
       },
     },
   } as PipelineStage,
+  {
+    $addFields: {
+      percentile_rank: {
+        $cond: [
+          { $lte: ["$total_users", 1] },
+          0,
+          {
+            $divide: [{ $subtract: ["$rank", 1] }, { $subtract: ["$total_users", 1] }],
+          },
+        ],
+      },
+    },
+  },
   {
     $group: {
       _id: null,

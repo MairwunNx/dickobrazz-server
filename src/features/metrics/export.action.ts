@@ -1,11 +1,11 @@
 import type { CockDal } from "@/entities/cock";
 import type { UserDal } from "@/entities/user";
 import { di } from "@/shared/injection";
-import { getMoscowDate } from "@/shared/lib/datetime";
+import { moscowNow, toDate } from "@/shared/lib/datetime";
 import { logger } from "@/shared/lib/logger";
 import { activeUsersGauge, registry, sizeDistributionGauge, totalUsersGauge } from "@/shared/lib/metrics";
-import { pActiveUsersSince, pSizeDistribution } from "./db/pipelines";
 import { createTicker } from "@/shared/lib/profiling";
+import { pActiveUsersSince, pSizeDistribution } from "./db/pipelines";
 
 export const createExportMetricsAction = (cockDal: CockDal, userDal: UserDal) => async (): Promise<string> => {
   logger.debug("Exporting Prometheus metrics", {
@@ -15,9 +15,9 @@ export const createExportMetricsAction = (cockDal: CockDal, userDal: UserDal) =>
 
   const ticker = createTicker();
 
-  const now = getMoscowDate();
-  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const now = moscowNow();
+  const dayAgo = toDate(now.subtract({ hours: 24 }));
+  const monthAgo = toDate(now.subtract({ days: 30 }));
 
   const [totalUsers, dauResult, mauResult, distribution] = await Promise.all([
     userDal.count(),

@@ -1,20 +1,23 @@
-import type { UserProfile } from "@/entities/user";
+import type { UserDal, UserProfile } from "@/entities/user";
 import { getAuthUser } from "@/shared/context";
+import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 
-export const createGetProfileAction = () => async (): Promise<UserProfile> => {
+export const createGetProfileAction = (userDal: UserDal) => async (): Promise<UserProfile> => {
   const ticker = createTicker();
-  const userId = getAuthUser().id;
+  const authUser = getAuthUser();
+  const userId = authUser.id;
 
-  // TODO: реализовать бизнес-логику получения профиля пользователя
+  const userDoc = await userDal.findByUserId(userId);
+
   const result: UserProfile = {
     id: userId,
-    username: undefined,
-    first_name: undefined,
-    last_name: undefined,
-    photo_url: undefined,
-    is_hidden: true,
+    username: userDoc?.username ?? authUser.username,
+    first_name: authUser.first_name,
+    last_name: authUser.last_name,
+    photo_url: authUser.photo_url,
+    is_hidden: userDoc?.is_hidden ?? false,
   };
 
   logger.debug("User profile retrieved", {
@@ -26,3 +29,5 @@ export const createGetProfileAction = () => async (): Promise<UserProfile> => {
 
   return result;
 };
+
+createGetProfileAction.inject = [di.userDal] as const;

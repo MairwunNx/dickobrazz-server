@@ -31,6 +31,7 @@ export const SeasonWithWinnersSchema = SeasonInfoSchema.extend({
 export const CockSeasonsResponseSchema = z.object({
   seasons: SeasonWithWinnersSchema.array(),
   page: PageMetaSchema,
+  user_season_wins: z.number().optional(),
 });
 
 export type SeasonInfo = z.infer<typeof SeasonInfoSchema>;

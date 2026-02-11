@@ -20,5 +20,6 @@ export const createRoutes = (container: Container, routeOf: Pipeline): Record<st
     "/api/v1/cock/achievements": { GET: routeOf(h(di.achievementsHandler), { protected: true }) },
     "/api/v1/cock/ladder": { GET: routeOf(h(di.ladderHandler)) },
     "/api/v1/cock/seasons": { GET: routeOf(h(di.seasonsHandler)) },
+    "/api/v1/cock/respects": { GET: routeOf(h(di.respectsHandler), { protected: true }) },
   };
 };

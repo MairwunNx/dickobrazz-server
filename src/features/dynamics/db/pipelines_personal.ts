@@ -321,6 +321,7 @@ export const pPersonalRecordAndDates = (userId: number): PipelineStage[] => [
  */
 export const pPersonalGrowthSpeed = (userId: number): PipelineStage[] => [
   { $match: { user_id: userId } },
+  { $sort: { requested_at: 1 } },
   {
     $group: {
       _id: {

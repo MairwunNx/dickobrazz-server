@@ -13,6 +13,7 @@ import { createGetLadderAction, createLadderHandler } from "@/features/ladder";
 import { createExportMetricsAction, createMetricsHandler } from "@/features/metrics";
 import { createGetProfileAction, createMeHandler, createPrivacyHandler, createUpdatePrivacyAction } from "@/features/profile";
 import { createGetRaceAction, createRaceHandler } from "@/features/race";
+import { createGetRespectAction, createRespectsHandler } from "@/features/respects";
 import { createGetRulerAction, createRulerHandler } from "@/features/ruler";
 import { createGetSeasonsAction, createSeasonsHandler } from "@/features/seasons";
 import type { AppConfig } from "@/shared/config/schema";
@@ -46,6 +47,7 @@ export const createContainer = (config: AppConfig, botToken: string, mongo: Db, 
     .provideFactory(di.getAchievementsAction, createGetAchievementsAction)
     .provideFactory(di.getLadderAction, createGetLadderAction)
     .provideFactory(di.getSeasonsAction, createGetSeasonsAction)
+    .provideFactory(di.getRespectAction, createGetRespectAction)
     // Handlers
     .provideFactory(di.authHandler, createAuthHandler)
     .provideFactory(di.healthHandler, createHealthHandler)
@@ -59,6 +61,7 @@ export const createContainer = (config: AppConfig, botToken: string, mongo: Db, 
     .provideFactory(di.dynamicPersonalHandler, createDynamicPersonalHandler)
     .provideFactory(di.achievementsHandler, createAchievementsHandler)
     .provideFactory(di.ladderHandler, createLadderHandler)
-    .provideFactory(di.seasonsHandler, createSeasonsHandler);
+    .provideFactory(di.seasonsHandler, createSeasonsHandler)
+    .provideFactory(di.respectsHandler, createRespectsHandler);
 
 export type Container = ReturnType<typeof createContainer>;

@@ -8,7 +8,7 @@ import { createTicker } from "@/shared/lib/profiling";
 import { type CockSeason, getAllSeasons } from "@/shared/lib/seasons";
 import { createPageMeta, PAGE_LIMIT_MIN } from "@/shared/net/pagination";
 import type { AggWinner } from "./db/pipelines";
-import { pFirstCockDate, pNeighborhoodInSeason, pSeasonCockersCount, pSeasonWinners, pUserPositionInSeason } from "./db/pipelines";
+import { pFirstCockDate, pNeighborhoodInSeason, pSeasonCockersCount, pSeasonWinners, pUserPositionInSeason, pUserSeasonWins } from "./db/pipelines";
 import type { CockSeasonsResponse, SeasonNeighborhood, SeasonWinner } from "./types";
 
 interface PaginationParams {
@@ -37,6 +37,10 @@ export const createGetSeasonsAction =
 
     const start = (page - 1) * limit;
     const paginatedSeasons = allSeasons.slice(start, start + limit);
+
+    const completedSeasons = allSeasons.filter((s) => !s.is_active).map((s) => ({ start: new Date(s.start_date), end: new Date(s.end_date), season_num: s.season_num }));
+
+    const winsPromise = userId && completedSeasons.length > 0 ? cockDal.aggregate<{ wins: number }>(pUserSeasonWins(userId, completedSeasons)) : Promise.resolve([]);
 
     const seasonData = await Promise.all(
       paginatedSeasons.map(async (season) => {
@@ -108,6 +112,9 @@ export const createGetSeasonsAction =
       };
     });
 
+    const winsResult = await winsPromise;
+    const userSeasonWins = winsResult[0]?.wins;
+
     logger.info("Get cock seasons", {
       service: "cocks",
       operation: "getSeasons",
@@ -119,6 +126,7 @@ export const createGetSeasonsAction =
     return {
       seasons,
       page: createPageMeta(limit, allSeasons.length, page),
+      ...(userSeasonWins !== undefined && { user_season_wins: userSeasonWins }),
     };
   };
 

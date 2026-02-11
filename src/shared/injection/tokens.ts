@@ -26,6 +26,7 @@ export const di = {
   getAchievementsAction: "getAchievementsAction",
   getLadderAction: "getLadderAction",
   getSeasonsAction: "getSeasonsAction",
+  getRespectAction: "getRespectAction",
 
   // Handlers
   authHandler: "authHandler",
@@ -41,4 +42,5 @@ export const di = {
   achievementsHandler: "achievementsHandler",
   ladderHandler: "ladderHandler",
   seasonsHandler: "seasonsHandler",
+  respectsHandler: "respectsHandler",
 } as const;

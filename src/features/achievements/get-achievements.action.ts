@@ -261,7 +261,11 @@ const formatResponse = (userAchievements: AchievementDoc[]): CockAchievementsRes
     return 0;
   });
 
-  return { achievements: result };
+  const achievements_total = result.length;
+  const achievements_done = result.filter((a) => a.completed).length;
+  const achievements_done_percent = achievements_total > 0 ? Math.round((achievements_done / achievements_total) * 100) : 0;
+
+  return { achievements: result, achievements_total, achievements_done, achievements_done_percent };
 };
 
 const updateAllLastChecked = async (achievementDal: AchievementDal, userId: number, now: Date) => {

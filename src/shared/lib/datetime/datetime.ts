@@ -1,35 +1,20 @@
-const MOSCOW_TZ = "Europe/Moscow";
+import { Temporal } from "@js-temporal/polyfill";
 
-export const toMoscowDate = (date: Date): Date => new Date(date.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
+const TZ = "Europe/Moscow";
 
-export const getMoscowDate = (): Date => toMoscowDate(new Date());
+export const moscowNow = (): Temporal.ZonedDateTime => Temporal.Now.zonedDateTimeISO(TZ);
 
-export const getMoscowDayStart = (): Date => {
-  const moscowDate = getMoscowDate();
-  moscowDate.setHours(0, 0, 0, 0);
-  return moscowDate;
-};
+export const moscowDayStart = (): Temporal.ZonedDateTime => moscowNow().startOfDay();
 
-export const getMoscowDayEnd = (): Date => {
-  const moscowDate = getMoscowDate();
-  moscowDate.setHours(23, 59, 59, 999);
-  return moscowDate;
-};
+export const fromDate = (date: Date): Temporal.ZonedDateTime => Temporal.Instant.fromEpochMilliseconds(date.getTime()).toZonedDateTimeISO(TZ);
 
-export const formatMoscowISO = (date: Date): string => {
-  return new Date(date.toLocaleString("en-US", { timeZone: MOSCOW_TZ })).toISOString().replace("Z", "+03:00");
-};
+export const toDate = (zdt: Temporal.ZonedDateTime): Date => new Date(zdt.epochMilliseconds);
 
 export const getTtlToMoscowMidnight = (): number => {
-  const now = getMoscowDate();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  return Math.floor((tomorrow.getTime() - now.getTime()) / 1000);
+  const now = moscowNow();
+  return Math.floor(now.until(now.startOfDay().add({ days: 1 })).total("seconds"));
 };
 
-export const isSameDay = (date1: Date, date2: Date): boolean => {
-  const d1 = new Date(date1.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
-  const d2 = new Date(date2.toLocaleString("en-US", { timeZone: MOSCOW_TZ }));
-  return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
-};
+export const isSameMoscowDay = (a: Date, b: Date): boolean => Temporal.PlainDate.compare(fromDate(a).toPlainDate(), fromDate(b).toPlainDate()) === 0;
+
+export const formatMoscowISO = (date: Date): string => fromDate(date).toString();

@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema<UserDoc>(
     user_id: { type: Number, required: true },
     username: { type: String },
     is_hidden: { type: Boolean, required: true },
+    created_at: { type: Date },
     updated_at: { type: Date, required: true },
   },
   { collection: "users", versionKey: false }

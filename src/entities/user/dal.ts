@@ -30,7 +30,7 @@ export const createUserDal = () => {
               is_hidden: profile.is_hidden,
               updated_at: new Date(),
             },
-            $setOnInsert: { user_id: profile.id },
+            $setOnInsert: { user_id: profile.id, created_at: new Date() },
           },
           { upsert: true, new: true, lean: true }
         )
@@ -45,7 +45,7 @@ export const createUserDal = () => {
           { user_id: userId },
           {
             $set: { username, updated_at: new Date() },
-            $setOnInsert: { user_id: userId, is_hidden: false },
+            $setOnInsert: { user_id: userId, is_hidden: false, created_at: new Date() },
           },
           { upsert: true, new: true, lean: true }
         )

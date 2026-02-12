@@ -12,6 +12,12 @@ export const createCockDal = () => {
     /** Выполняет агрегацию и возвращает результат. */
     aggregate: <T>(pipeline: PipelineStage[]) => model.aggregate<T>(pipeline).exec(),
 
+    /** Дата первого кока пользователя (или null). */
+    findFirstCockDate: async (userId: number): Promise<Date | null> => {
+      const doc = await model.findOne({ user_id: userId }).sort({ requested_at: 1 }).select({ requested_at: 1 }).lean().exec();
+      return doc?.requested_at ?? null;
+    },
+
     /** Синхронизирует индексы модели с MongoDB. */
     syncIndexes: () => model.syncIndexes(),
   };

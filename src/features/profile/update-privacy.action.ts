@@ -1,3 +1,4 @@
+import type { CockDal } from "@/entities/cock";
 import type { UserDal, UserProfile } from "@/entities/user";
 import { normalizeNickname } from "@/entities/user";
 import { getAuthUser } from "@/shared/context";
@@ -7,7 +8,7 @@ import { createTicker } from "@/shared/lib/profiling";
 import type { UpdatePrivacyParams } from "./types";
 
 export const createUpdatePrivacyAction =
-  (userDal: UserDal) =>
+  (userDal: UserDal, cockDal: CockDal) =>
   async (params: UpdatePrivacyParams): Promise<UserProfile> => {
     const ticker = createTicker();
     const authUser = getAuthUser();
@@ -16,6 +17,8 @@ export const createUpdatePrivacyAction =
     const updated = await userDal.updatePrivacy(userId, params.is_hidden);
     const isHidden = updated?.is_hidden ?? params.is_hidden;
 
+    const createdAt = updated?.created_at ?? (await cockDal.findFirstCockDate(userId));
+
     const result: UserProfile = {
       id: userId,
       username: isHidden ? normalizeNickname(updated ?? null, userId) : (updated?.username ?? authUser.username),
@@ -23,7 +26,7 @@ export const createUpdatePrivacyAction =
       last_name: authUser.last_name,
       photo_url: authUser.photo_url,
       is_hidden: isHidden,
-      created_at: updated?.created_at?.toISOString() ?? null,
+      created_at: createdAt?.toISOString() ?? null,
     };
 
     logger.debug("User privacy updated", {
@@ -37,4 +40,4 @@ export const createUpdatePrivacyAction =
     return result;
   };
 
-createUpdatePrivacyAction.inject = [di.userDal] as const;
+createUpdatePrivacyAction.inject = [di.userDal, di.cockDal] as const;

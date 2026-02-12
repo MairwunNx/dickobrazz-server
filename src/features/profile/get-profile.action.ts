@@ -1,4 +1,5 @@
 import type { UserDal, UserProfile } from "@/entities/user";
+import { normalizeNickname } from "@/entities/user";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
@@ -10,14 +11,16 @@ export const createGetProfileAction = (userDal: UserDal) => async (): Promise<Us
   const userId = authUser.id;
 
   const userDoc = await userDal.findByUserId(userId);
+  const isHidden = userDoc?.is_hidden ?? false;
 
   const result: UserProfile = {
     id: userId,
-    username: userDoc?.username ?? authUser.username,
+    username: isHidden ? normalizeNickname(userDoc ?? null, userId) : (userDoc?.username ?? authUser.username),
     first_name: authUser.first_name,
     last_name: authUser.last_name,
     photo_url: authUser.photo_url,
-    is_hidden: userDoc?.is_hidden ?? false,
+    is_hidden: isHidden,
+    created_at: userDoc?.created_at?.toISOString() ?? null,
   };
 
   logger.debug("User profile retrieved", {

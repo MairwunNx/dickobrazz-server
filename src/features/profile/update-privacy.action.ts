@@ -1,4 +1,5 @@
 import type { UserDal, UserProfile } from "@/entities/user";
+import { normalizeNickname } from "@/entities/user";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
 import { logger } from "@/shared/lib/logger";
@@ -13,14 +14,16 @@ export const createUpdatePrivacyAction =
     const userId = authUser.id;
 
     const updated = await userDal.updatePrivacy(userId, params.is_hidden);
+    const isHidden = updated?.is_hidden ?? params.is_hidden;
 
     const result: UserProfile = {
       id: userId,
-      username: updated?.username ?? authUser.username,
+      username: isHidden ? normalizeNickname(updated ?? null, userId) : (updated?.username ?? authUser.username),
       first_name: authUser.first_name,
       last_name: authUser.last_name,
       photo_url: authUser.photo_url,
-      is_hidden: updated?.is_hidden ?? params.is_hidden,
+      is_hidden: isHidden,
+      created_at: updated?.created_at?.toISOString() ?? null,
     };
 
     logger.debug("User privacy updated", {

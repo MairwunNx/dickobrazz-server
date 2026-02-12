@@ -26,24 +26,26 @@ export const createGenerateSizeAction = (cockDal: CockDal, redis: RedisClient, r
       size: parsed.size,
       duration_ms: ticker(),
     });
-    return { size: parsed.size, hash: parsed.hash, salt: parsed.salt };
+    return { size: parsed.size, hash: parsed.hash, salt: parsed.salt, pulled_at: parsed.pulled_at };
   }
 
   const size = await random(0, 61);
 
+  const pulledAt = toDate(moscowNow());
   await cockDal.create({
     _id: crypto.randomUUID(),
     size,
     nickname,
     user_id: userId,
-    requested_at: toDate(moscowNow()),
+    requested_at: pulledAt,
   });
 
   const salt = crypto.randomUUID();
   const hash = computeHash(salt, size);
+  const pulledAtISO = pulledAt.toISOString();
 
   const ttl = getTtlToMoscowMidnight();
-  const cacheValue = JSON.stringify({ user_id: userId, user_name: nickname, size, hash, salt });
+  const cacheValue = JSON.stringify({ user_id: userId, user_name: nickname, size, hash, salt, pulled_at: pulledAtISO });
 
   try {
     await redis.set(cacheKey, cacheValue);
@@ -67,7 +69,7 @@ export const createGenerateSizeAction = (cockDal: CockDal, redis: RedisClient, r
     duration_ms: ticker(),
   });
 
-  return { size, hash, salt };
+  return { size, hash, salt, pulled_at: pulledAtISO };
 };
 
 createGenerateSizeAction.inject = [di.cockDal, di.redis, di.random] as const;

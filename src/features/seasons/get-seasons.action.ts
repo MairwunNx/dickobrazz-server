@@ -47,7 +47,7 @@ export const createGetSeasonsAction =
         const { startDate, endDate } = seasonDates(season);
 
         const [rawWinners, countResult, positionResult] = await Promise.all([
-          season.is_active ? Promise.resolve([]) : cockDal.aggregate<AggWinner>(pSeasonWinners(startDate, endDate)),
+          cockDal.aggregate<AggWinner>(pSeasonWinners(startDate, endDate)),
           cockDal.aggregate<{ total: number }>(pSeasonCockersCount(startDate, endDate)),
           userId ? cockDal.aggregate<{ position: number }>(pUserPositionInSeason(userId, startDate, endDate)) : Promise.resolve([]),
         ]);

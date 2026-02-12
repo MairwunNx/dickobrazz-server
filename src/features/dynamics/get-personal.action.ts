@@ -1,6 +1,7 @@
 import type { CockDal } from "@/entities/cock";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
+import { toMoscowDayStartISO } from "@/shared/lib/datetime";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { PersonalGrowthSpeedResult, PersonalLast5FacetResult, PersonalRecordAndDatesResult, PersonalTotalsAndRatiosResult } from "./db/pipelines_personal";
@@ -39,8 +40,8 @@ export const createGetDynamicPersonalAction = (cockDal: CockDal) => async (): Pr
     recent_average: userRecent?.average ?? 0,
     irk: totals?.irk ?? 0,
     record: {
-      requested_at: userRecord?.requested_at?.toISOString() ?? null,
-      total: userRecord?.total ?? 0,
+      requested_at: userRecord?.requested_at ? toMoscowDayStartISO(userRecord.requested_at) : null,
+      size: userRecord?.total ?? 0,
     },
     dominance: totals?.dominance ?? 0,
     daily_growth_average: dailyGrowth?.average ?? 0,

@@ -18,3 +18,6 @@ export const getTtlToMoscowMidnight = (): number => {
 export const isSameMoscowDay = (a: Date, b: Date): boolean => Temporal.PlainDate.compare(fromDate(a).toPlainDate(), fromDate(b).toPlainDate()) === 0;
 
 export const formatMoscowISO = (date: Date): string => fromDate(date).toString();
+
+/** Возвращает ISO-строку начала московского дня (00:00 МСК) для переданной даты. */
+export const toMoscowDayStartISO = (date: Date): string => new Date(fromDate(date).startOfDay().epochMilliseconds).toISOString();

@@ -1,5 +1,6 @@
 import type { CockDal } from "@/entities/cock";
 import { di } from "@/shared/injection";
+import { toMoscowDayStartISO } from "@/shared/lib/datetime";
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { GlobalDynamicsRaw } from "./db/pipelines_global";
@@ -29,7 +30,7 @@ export const createGetDynamicGlobalAction = (cockDal: CockDal) => async (): Prom
       little_percent: recentDist?.little_percent ?? 0,
     },
     record: {
-      requested_at: record?.requested_at?.toISOString() ?? new Date().toISOString(),
+      requested_at: record?.requested_at ? toMoscowDayStartISO(record.requested_at) : null,
       total: record?.total ?? 0,
     },
     total_cocks_count: totals?.total_count ?? 0,

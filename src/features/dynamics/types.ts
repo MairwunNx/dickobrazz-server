@@ -10,9 +10,14 @@ export const CockDynamicPercentileSchema = z.object({
   little_percent: z.number(),
 });
 
-export const CockDynamicRecordSchema = z.object({
+export const CockGlobalRecordSchema = z.object({
   requested_at: z.string().nullable(),
   total: z.number(),
+});
+
+export const CockPersonalRecordSchema = z.object({
+  requested_at: z.string().nullable(),
+  size: z.number(),
 });
 
 export const CockDynamicDailyDynamicsSchema = z.object({
@@ -30,7 +35,7 @@ export const CockDynamicOverallSchema = z.object({
   unique_users: z.number(),
   recent: CockDynamicRecentStatSchema,
   distribution: CockDynamicPercentileSchema,
-  record: CockDynamicRecordSchema,
+  record: CockGlobalRecordSchema,
   total_cocks_count: z.number(),
   growth_speed: z.number(),
 });
@@ -39,7 +44,7 @@ export const CockDynamicIndividualSchema = z.object({
   total_size: z.number(),
   recent_average: z.number(),
   irk: z.number(),
-  record: CockDynamicRecordSchema,
+  record: CockPersonalRecordSchema,
   dominance: z.number(),
   daily_growth_average: z.number(),
   daily_dynamics: CockDynamicDailyDynamicsSchema,

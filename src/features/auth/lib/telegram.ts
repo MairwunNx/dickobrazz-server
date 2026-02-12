@@ -42,6 +42,7 @@ export const validateTelegramAuthPayload = (payload: TelegramAuthPayload, botTok
       last_name: payload.last_name,
       photo_url: payload.photo_url,
       is_hidden: false,
+      created_at: null,
     };
 
     logger.info("Telegram auth payload validated", {

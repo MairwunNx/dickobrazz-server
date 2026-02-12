@@ -56,6 +56,7 @@ export const createValidateAction = (config: AppConfig) => {
           last_name: undefined,
           photo_url: undefined,
           is_hidden: false,
+          created_at: null,
         };
       }
 
@@ -76,6 +77,7 @@ export const createValidateAction = (config: AppConfig) => {
             last_name: undefined,
             photo_url: undefined,
             is_hidden: false,
+            created_at: null,
           },
         };
       }

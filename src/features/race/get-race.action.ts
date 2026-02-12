@@ -104,7 +104,6 @@ export const createGetRaceAction =
             season_num: currentSeason.season_num,
             start_date: currentSeason.start_date,
             end_date: currentSeason.end_date,
-            is_active: currentSeason.is_active,
           }
         : undefined,
       leaders,

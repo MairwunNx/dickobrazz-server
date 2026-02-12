@@ -15,10 +15,10 @@ interface PaginationParams {
   page?: number;
 }
 
-const toLeaderboardEntry = (userId: number, size: number, userMap: Map<number, UserDoc>): LeaderboardEntry => ({
+const toLeaderboardEntry = (userId: number, totalSize: number, userMap: Map<number, UserDoc>): LeaderboardEntry => ({
   user_id: userId,
   nickname: normalizeNickname(userMap.get(userId) ?? null, userId),
-  size,
+  total_size: totalSize,
 });
 
 export const createGetLadderAction =

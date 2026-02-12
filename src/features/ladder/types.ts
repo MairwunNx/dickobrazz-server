@@ -4,7 +4,7 @@ import { PageMetaSchema } from "@/shared/net/pagination/pagination";
 export const LeaderboardEntrySchema = z.object({
   user_id: z.number(),
   nickname: z.string(),
-  size: z.number(),
+  total_size: z.number(),
 });
 
 export const UserNeighborhoodSchema = z.object({

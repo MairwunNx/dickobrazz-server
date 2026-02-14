@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Dickobrazz API",
-    "description": "Backend API для Dickobrazz. Авторизация через CSOT: задай `csot_token`, `x_internal_user_id`, `x_internal_user_name` в variables. Для защищённых ручек заголовки обязательны, для остальных — опциональны (можно включить для персональных данных).",
+    "description": "Backend API для Dickobrazz.\n\nАвторизация поддерживается тремя способами:\n1) Cookie `session_token` (после `/auth/login`)\n2) `Authorization: Bearer <session_token>`\n3) CSOT заголовки: `x-internal-token`, `x-internal-user-id`, `x-internal-user-name`\n\nВажно:\n- Для protected ручек обязательно передавай валидную авторизацию.\n- Если используешь CSOT на user-scoped ручках, обязательно передавай `x-internal-user-id`.\n- Для публичных ручек заголовки опциональны и нужны только для персонализированных полей (`user_position`, `neighborhood`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -22,6 +22,11 @@
     {
       "key": "x_internal_user_name",
       "value": "Test",
+      "type": "string"
+    },
+    {
+      "key": "session_token",
+      "value": "",
       "type": "string"
     }
   ],
@@ -52,7 +57,7 @@
     },
     {
       "name": "Auth",
-      "description": "Авторизация",
+      "description": "Авторизация через Telegram. После успешного логина сервер выставляет cookie `session_token` и возвращает `data.session_token` в JSON.",
       "item": [
         {
           "name": "Вход (Telegram)",
@@ -69,14 +74,14 @@
               "raw": "{\n  \"id\": 12345,\n  \"first_name\": \"Test\",\n  \"auth_date\": 1234567890,\n  \"hash\": \"...\"\n}"
             },
             "url": "{{base_url}}/auth/login",
-            "description": "Вход через Telegram Init Data"
+            "description": "Вход через Telegram Init Data. Успешный ответ: `data.user` + `data.session_token`."
           }
         }
       ]
     },
     {
       "name": "Profile (protected)",
-      "description": "Профиль пользователя. Требует авторизации.",
+      "description": "Профиль пользователя. Требует авторизации (cookie / bearer / CSOT). Для CSOT обязательно указывай `x-internal-user-id`.",
       "item": [
         {
           "name": "Получить профиль",
@@ -140,7 +145,7 @@
     },
     {
       "name": "Cock",
-      "description": "Размер, лидерборды, dynamics, achievements",
+      "description": "Размер, лидерборды, dynamics, achievements. Часть ручек public с опциональной персонализацией, часть — protected.",
       "item": [
         {
           "name": "Размер (protected)",
@@ -164,7 +169,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/size",
-            "description": "Сгенерировать новый размер"
+            "description": "Protected: сгенерировать новый размер. Нужна авторизация (cookie / bearer / CSOT + x-internal-user-id)."
           }
         },
         {
@@ -192,7 +197,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/ruler?limit=20&page=1",
-            "description": "Лидерборд текущего размера. Заголовки опциональны — включи для user_position и neighborhood."
+            "description": "Public: лидерборд текущего размера. Заголовки опциональны; добавь user-контекст для `user_position` и `neighborhood`."
           }
         },
         {
@@ -220,7 +225,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/race?limit=20&page=1",
-            "description": "Лидерборд сезона. Заголовки опциональны."
+            "description": "Public: лидерборд сезона. Заголовки опциональны; добавь user-контекст для персональных полей."
           }
         },
         {
@@ -248,7 +253,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/dynamic/global",
-            "description": "Глобальная динамика. Заголовки опциональны."
+            "description": "Public: глобальная динамика. Можно вызывать без авторизации."
           }
         },
         {
@@ -273,7 +278,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/dynamic/personal",
-            "description": "Персональная динамика"
+            "description": "Protected: персональная динамика пользователя."
           }
         },
         {
@@ -298,7 +303,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/achievements",
-            "description": "Достижения пользователя"
+            "description": "Protected: достижения пользователя."
           }
         },
         {
@@ -326,7 +331,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/ladder?limit=20&page=1",
-            "description": "Общий лидерборд. Заголовки опциональны."
+            "description": "Public: общий лидерборд. Заголовки опциональны; добавь user-контекст для персональных полей."
           }
         },
         {
@@ -354,7 +359,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/seasons?limit=20&page=1",
-            "description": "История сезонов. Заголовки опциональны."
+            "description": "Public: история сезонов. Заголовки опциональны; с user-контекстом появляются персональные поля."
           }
         },
         {
@@ -379,7 +384,7 @@
               }
             ],
             "url": "{{base_url}}/api/v1/cock/respects",
-            "description": "Кок-респекты юзака"
+            "description": "Protected: кок-респекты пользователя."
           }
         }
       ]

@@ -1,7 +1,20 @@
 openapi: 3.0.3
 info:
   title: Dickobrazz API
-  description: Backend API для Dickobrazz (dickobrazz.com) — Telegram бот с daily size, leaderboards, seasons, achievements.
+  description: |
+    Backend API для Dickobrazz (dickobrazz.com) — Telegram бот с daily size, leaderboards, seasons, achievements.
+
+    ## Авторизация
+    API поддерживает 3 способа аутентификации:
+    1. `session_token` cookie (после `/auth/login`)
+    2. `Authorization: Bearer <session_token>`
+    3. CSOT заголовки:
+       - `x-internal-token` — токен сервиса
+       - `x-internal-user-id` — ID пользователя (обязателен для user-scoped protected ручек)
+       - `x-internal-user-name` — ник пользователя (опционально, но рекомендуется для персональных данных)
+
+    Для protected ручек требуется успешная аутентификация.
+    Для публичных ручек CSOT заголовки опциональны и влияют только на персонализированные поля (`user_position`, `neighborhood`).
   version: 0.0.3
 
 servers:
@@ -55,6 +68,9 @@ paths:
     post:
       tags: [Auth]
       summary: Вход через Telegram Init Data
+      description: |
+        Валидирует Telegram init data, создает сессию и возвращает `session_token`.
+        Также устанавливает cookie `session_token`.
       operationId: postAuthLogin
       requestBody:
         required: true
@@ -78,6 +94,10 @@ paths:
     get:
       tags: [Profile]
       summary: Получить профиль текущего пользователя
+      description: |
+        Protected endpoint.
+        Поддерживает cookie, bearer и CSOT.
+        Если используется CSOT, для корректного user-контекста передавай `x-internal-user-id`, `x-internal-user-name`.
       operationId: getMe
       security:
         - cookieAuth: []
@@ -97,6 +117,10 @@ paths:
     patch:
       tags: [Profile]
       summary: Обновить настройки приватности
+      description: |
+        Protected endpoint.
+        Поддерживает cookie, bearer и CSOT.
+        Если используется CSOT, для корректного user-контекста передавай `x-internal-user-id`, `x-internal-user-name`.
       operationId: patchMePrivacy
       security:
         - cookieAuth: []
@@ -124,6 +148,10 @@ paths:
     post:
       tags: [Cock]
       summary: Стянуть кокич
+      description: |
+        Protected endpoint.
+        Поддерживает cookie, bearer и CSOT.
+        Если используется CSOT, для корректного user-контекста передавай `x-internal-user-id`, `x-internal-user-name`.
       operationId: postCockSize
       security:
         - cookieAuth: []
@@ -143,10 +171,17 @@ paths:
     get:
       tags: [Cock]
       summary: Дейли-топ лидерборд (кок-рулетка)
+      description: |
+        Публичный endpoint с опциональной персонализацией.
+        Без авторизации вернет общий лидерборд.
+        С user-контекстом дополнительно заполняет `user_position` и `neighborhood`.
       operationId: getCockRuler
       parameters:
         - $ref: "#/components/parameters/LimitParam"
         - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/XInternalTokenHeader"
+        - $ref: "#/components/parameters/XInternalUserIdHeader"
+        - $ref: "#/components/parameters/XInternalUserNameHeader"
       responses:
         "200":
           description: OK
@@ -154,15 +189,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CockRulerDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/cock/race:
     get:
       tags: [Cock]
       summary: Гонка коков (лидерборд сезона)
+      description: |
+        Публичный endpoint с опциональной персонализацией.
+        Без авторизации вернет общий лидерборд сезона.
+        С user-контекстом дополнительно заполняет `user_position` и `neighborhood`.
       operationId: getCockRace
       parameters:
         - $ref: "#/components/parameters/LimitParam"
         - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/XInternalTokenHeader"
+        - $ref: "#/components/parameters/XInternalUserIdHeader"
+        - $ref: "#/components/parameters/XInternalUserNameHeader"
       responses:
         "200":
           description: OK
@@ -170,12 +214,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CockRaceDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/cock/dynamic/global:
     get:
       tags: [Cock]
       summary: Общая динамика коков
+      description: |
+        Публичный endpoint.
+        Может вызываться без авторизации.
+        CSOT заголовки можно передавать, но на тело ответа (пока что) они не влияют.
       operationId: getCockDynamicGlobal
+      parameters:
+        - $ref: "#/components/parameters/XInternalTokenHeader"
+        - $ref: "#/components/parameters/XInternalUserIdHeader"
+        - $ref: "#/components/parameters/XInternalUserNameHeader"
       responses:
         "200":
           description: OK
@@ -183,11 +237,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CockDynamicGlobalDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/cock/dynamic/personal:
     get:
       tags: [Cock]
       summary: Персональная динамика коков
+      description: |
+        Protected endpoint.
+        Поддерживает cookie, bearer и CSOT.
+        Если используется CSOT, для корректного user-контекста передавай `x-internal-user-id`, `x-internal-user-name`.
       operationId: getCockDynamicPersonal
       security:
         - cookieAuth: []
@@ -207,6 +267,10 @@ paths:
     get:
       tags: [Cock]
       summary: Достижения пользователя
+      description: |
+        Protected endpoint.
+        Поддерживает cookie, bearer и CSOT.
+        Если используется CSOT, для корректного user-контекста передавай `x-internal-user-id`, `x-internal-user-name`.
       operationId: getCockAchievements
       security:
         - cookieAuth: []
@@ -226,10 +290,17 @@ paths:
     get:
       tags: [Cock]
       summary: Ладдер коков, общий лидерборд
+      description: |
+        Публичный endpoint с опциональной персонализацией.
+        Без авторизации вернет общий лидерборд.
+        С user-контекстом дополнительно заполняет `user_position` и `neighborhood`.
       operationId: getCockLadder
       parameters:
         - $ref: "#/components/parameters/LimitParam"
         - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/XInternalTokenHeader"
+        - $ref: "#/components/parameters/XInternalUserIdHeader"
+        - $ref: "#/components/parameters/XInternalUserNameHeader"
       responses:
         "200":
           description: OK
@@ -237,15 +308,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CockLadderDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/cock/seasons:
     get:
       tags: [Cock]
       summary: Сезоны, список и победители
+      description: |
+        Публичный endpoint с опциональной персонализацией.
+        Без авторизации вернет сезоны и победителей.
+        С user-контекстом дополнительно заполняет персональные позиции и `user_season_wins`.
       operationId: getCockSeasons
       parameters:
         - $ref: "#/components/parameters/LimitParam"
         - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/XInternalTokenHeader"
+        - $ref: "#/components/parameters/XInternalUserIdHeader"
+        - $ref: "#/components/parameters/XInternalUserNameHeader"
       responses:
         "200":
           description: OK
@@ -253,11 +333,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CockSeasonsDataResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/cock/respects:
     get:
       tags: [Cock]
       summary: Кок-респекты, детализация респектов за сезоны и ачивки
+      description: |
+        Protected endpoint.
+        Поддерживает cookie, bearer и CSOT.
+        Если используется CSOT, для корректного user-контекста передавай `x-internal-user-id`, `x-internal-user-name`.
       operationId: getCockRespects
       security:
         - cookieAuth: []
@@ -309,6 +395,32 @@ components:
         type: integer
         minimum: 1
       description: Номер страницы
+    XInternalTokenHeader:
+      name: x-internal-token
+      in: header
+      required: false
+      schema:
+        type: string
+      description: |
+        CSOT токен для сервер-сервер авторизации.
+        Для protected методов обязателен, если не используешь cookie/bearer.
+    XInternalUserIdHeader:
+      name: x-internal-user-id
+      in: header
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+      description: |
+        ID пользователя для CSOT-контекста.
+        Для user-scoped protected методов фактически обязателен при авторизации через CSOT.
+    XInternalUserNameHeader:
+      name: x-internal-user-name
+      in: header
+      required: false
+      schema:
+        type: string
+      description: Опциональный username для CSOT-контекста.
 
   responses:
     Unauthorized:

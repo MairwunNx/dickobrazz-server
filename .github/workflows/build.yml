@@ -77,7 +77,12 @@ jobs:
           restore-keys: |
             bun-${{ runner.os }}-
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: |
+          if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            bun install
+          else
+            bun install --frozen-lockfile
+          fi
       - name: Run tests
         run: bun run test --reporter=junit --reporter-outfile=reports/junit.xml
       - name: Upload test report
@@ -109,7 +114,12 @@ jobs:
           restore-keys: |
             bun-${{ runner.os }}-
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: |
+          if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            bun install
+          else
+            bun install --frozen-lockfile
+          fi
       - name: Run checks
         run: bun run check
   typecheck:
@@ -135,7 +145,12 @@ jobs:
           restore-keys: |
             bun-${{ runner.os }}-
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: |
+          if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            bun install
+          else
+            bun install --frozen-lockfile
+          fi
       - name: Run typecheck
         run: bun run typecheck
   pr-check:

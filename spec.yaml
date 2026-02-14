@@ -30,13 +30,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HealthResponse"
+                $ref: "#/components/schemas/HealthDataResponse"
         "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HealthResponse"
+                $ref: "#/components/schemas/HealthDataResponse"
 
   /metrics:
     get:
@@ -46,6 +46,10 @@ paths:
       responses:
         "200":
           description: Prometheus text format
+          content:
+            text/plain:
+              schema:
+                type: string
 
   /auth/login:
     post:
@@ -65,6 +69,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthDataResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /api/v1/me:
     get:
@@ -309,10 +317,10 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/APIErrorResponse"
-        example:
-          error:
-            message: "Authentication required"
-            code: "AUTH_REQUIRED"
+          example:
+            error:
+              message: "Authentication required"
+              code: "AUTH_REQUIRED"
     ValidationError:
       description: Ошибка валидации
       content:
@@ -352,6 +360,12 @@ components:
               type: string
               enum: [ok, degraded, down]
 
+    HealthDataResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/HealthResponse"
+
     TelegramAuthPayload:
       type: object
       required: [id, first_name, auth_date, hash]
@@ -386,6 +400,9 @@ components:
           type: string
         is_hidden:
           type: boolean
+        created_at:
+          type: string
+          nullable: true
 
     AuthDataResponse:
       type: object
@@ -422,6 +439,8 @@ components:
             hash:
               type: string
             salt:
+              type: string
+            pulled_at:
               type: string
 
     LeaderboardEntry:
@@ -504,7 +523,7 @@ components:
           items:
             $ref: "#/components/schemas/RaceEntry"
 
-    SeasonInfo:
+    RaceSeasonInfo:
       type: object
       properties:
         season_num:
@@ -513,8 +532,6 @@ components:
           type: string
         end_date:
           type: string
-        is_active:
-          type: boolean
 
     CockRaceDataResponse:
       type: object
@@ -523,7 +540,7 @@ components:
           type: object
           properties:
             season:
-              $ref: "#/components/schemas/SeasonInfo"
+              $ref: "#/components/schemas/RaceSeasonInfo"
             leaders:
               type: array
               items:
@@ -554,13 +571,22 @@ components:
         little_percent:
           type: number
 
-    CockDynamicRecord:
+    CockDynamicGlobalRecord:
       type: object
       properties:
         requested_at:
           type: string
           nullable: true
         total:
+          type: integer
+
+    CockDynamicPersonalRecord:
+      type: object
+      properties:
+        requested_at:
+          type: string
+          nullable: true
+        size:
           type: integer
 
     CockDynamicOverall:
@@ -575,7 +601,7 @@ components:
         distribution:
           $ref: "#/components/schemas/CockDynamicPercentile"
         record:
-          $ref: "#/components/schemas/CockDynamicRecord"
+          $ref: "#/components/schemas/CockDynamicGlobalRecord"
         total_cocks_count:
           type: integer
         growth_speed:
@@ -585,10 +611,7 @@ components:
       type: object
       properties:
         data:
-          type: object
-          properties:
-            overall:
-              $ref: "#/components/schemas/CockDynamicOverall"
+          $ref: "#/components/schemas/CockDynamicOverall"
 
     CockDynamicDailyDynamics:
       type: object
@@ -616,7 +639,7 @@ components:
         irk:
           type: number
         record:
-          $ref: "#/components/schemas/CockDynamicRecord"
+          $ref: "#/components/schemas/CockDynamicPersonalRecord"
         dominance:
           type: number
         daily_growth_average:
@@ -685,16 +708,52 @@ components:
             leaders:
               type: array
               items:
-                $ref: "#/components/schemas/LeaderboardEntry"
+                $ref: "#/components/schemas/LadderEntry"
             total_participants:
               type: integer
             user_position:
               type: integer
               nullable: true
             neighborhood:
-              $ref: "#/components/schemas/UserNeighborhood"
+              $ref: "#/components/schemas/LadderNeighborhood"
             page:
               $ref: "#/components/schemas/PageMeta"
+
+    LadderEntry:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        nickname:
+          type: string
+        total_size:
+          type: integer
+
+    LadderNeighborhood:
+      type: object
+      properties:
+        above:
+          type: array
+          items:
+            $ref: "#/components/schemas/LadderEntry"
+        self:
+          $ref: "#/components/schemas/LadderEntry"
+        below:
+          type: array
+          items:
+            $ref: "#/components/schemas/LadderEntry"
+
+    SeasonInfo:
+      type: object
+      properties:
+        season_num:
+          type: integer
+        start_date:
+          type: string
+        end_date:
+          type: string
+        is_active:
+          type: boolean
 
     SeasonWinner:
       type: object

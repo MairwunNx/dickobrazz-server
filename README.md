@@ -9,6 +9,8 @@
 [![Docker](https://img.shields.io/badge/Docker-Available-2496ED?style=flat&logo=docker&logoColor=white)](https://github.com/MairwunNx/dickobrazz-server/pkgs/container/dickobrazz-server)
 [![GitHub Release](https://img.shields.io/github/v/release/MairwunNx/dickobrazz-server?style=flat&logo=github&color=blue)](https://github.com/MairwunNx/dickobrazz-server/releases)
 
+**Язык**: 🇷🇺 Русский | [🇺🇸 English](README.EN.md)
+
 🌶️ Backend API для экосистемы Dickobrazz (dickobrazz.com): генерация ежедневного размера, лидерборды, сезоны, ачивки, респекты, динамика и сервисные метрики.
 
 > [!NOTE]

@@ -44,12 +44,24 @@ export const createUserDal = () => {
         .findOneAndUpdate(
           { user_id: userId },
           {
-            $set: { username, updated_at: new Date() },
+            $set: { ...(username !== undefined && { username }), updated_at: new Date() },
             $setOnInsert: { user_id: userId, is_hidden: false, created_at: new Date() },
           },
           { upsert: true, new: true, lean: true }
         )
         .exec(),
+
+    /** Заполняет username для пользователей, у которых он пустой. Не перезаписывает существующий. */
+    backfillUsernames: (entries: { userId: number; username: string }[]) =>
+      model.bulkWrite(
+        entries.map((e) => ({
+          updateOne: {
+            filter: { user_id: e.userId, $or: [{ username: { $exists: false } }, { username: null }, { username: "" }] },
+            update: { $set: { username: e.username, updated_at: new Date() }, $setOnInsert: { is_hidden: false, created_at: new Date() } },
+            upsert: true,
+          },
+        }))
+      ),
 
     /** Общее количество пользователей в коллекции. */
     count: () => model.countDocuments().exec(),

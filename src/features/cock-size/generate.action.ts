@@ -1,3 +1,4 @@
+import type { RedisClient } from "bun";
 import type { CockDal } from "@/entities/cock";
 import { getAuthUser } from "@/shared/context";
 import { di } from "@/shared/injection";
@@ -6,7 +7,6 @@ import { getTtlToMoscowMidnight, moscowNow, toDate } from "@/shared/lib/datetime
 import { logger } from "@/shared/lib/logger";
 import { createTicker } from "@/shared/lib/profiling";
 import type { Random } from "@/shared/lib/random";
-import type { RedisClient } from "bun";
 import type { CockSizeResponse } from "./types";
 
 export const createGenerateSizeAction = (cockDal: CockDal, redis: RedisClient, random: Random) => async (): Promise<CockSizeResponse> => {

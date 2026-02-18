@@ -17,8 +17,8 @@ export const createGenerateSizeAction = (cockDal: CockDal, redis: RedisClient, r
   const cacheKey = `cock_size:${userId}`;
 
   const cached = await redis.get(cacheKey);
+  logger.info("***************************************** Cached", { cached: cached });
   if (cached) {
-    Bun.stdout.write(cached);
     const parsed = JSON.parse(cached);
     logger.info("Cock size from cache", {
       service: "cocks",

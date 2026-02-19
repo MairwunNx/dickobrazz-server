@@ -17,6 +17,13 @@ const backfillUsernames = async (container: Container): Promise<void> => {
   const pipeline: PipelineStage[] = [{ $sort: { requested_at: 1 } }, { $group: { _id: "$user_id", nickname: { $last: "$nickname" } } }, { $match: { nickname: { $ne: "" } } }];
 
   const entries = await cockDal.aggregate<{ _id: number; nickname: string }>(pipeline);
+
+  logger.info("Backfill: aggregated nicknames from cocks", {
+    service: "migration",
+    operation: "backfill_usernames",
+    entries_found: entries.length,
+  });
+
   if (entries.length === 0) return;
 
   const result = await userDal.backfillUsernames(entries.map((e) => ({ userId: e._id, username: e.nickname })));

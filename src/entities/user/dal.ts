@@ -57,8 +57,7 @@ export const createUserDal = () => {
         entries.map((e) => ({
           updateOne: {
             filter: { user_id: e.userId, $or: [{ username: { $exists: false } }, { username: null }, { username: "" }] },
-            update: { $set: { username: e.username, updated_at: new Date() }, $setOnInsert: { is_hidden: false, created_at: new Date() } },
-            upsert: true,
+            update: { $set: { username: e.username, updated_at: new Date() } },
           },
         }))
       ),

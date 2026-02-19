@@ -52,15 +52,23 @@ export const createUserDal = () => {
         .exec(),
 
     /** Заполняет username для пользователей, у которых он пустой. Не перезаписывает существующий. */
-    backfillUsernames: (entries: { userId: number; username: string }[]) =>
-      model.bulkWrite(
-        entries.map((e) => ({
-          updateOne: {
-            filter: { user_id: e.userId, $or: [{ username: { $exists: false } }, { username: null }, { username: "" }] },
-            update: { $set: { username: e.username, updated_at: new Date() } },
-          },
-        }))
-      ),
+    backfillUsernames: async (entries: { userId: number; username: string }[]) => {
+      const ops = entries.map((e) => ({
+        updateOne: {
+          filter: { user_id: e.userId, $or: [{ username: { $exists: false } }, { username: null }, { username: "" }] },
+          update: { $set: { username: e.username, updated_at: new Date() }, $setOnInsert: { is_hidden: false, created_at: new Date() } },
+          upsert: true,
+        },
+      }));
+      try {
+        return await model.bulkWrite(ops, { ordered: false });
+      } catch (err: unknown) {
+        if (err && typeof err === "object" && "code" in err && err.code === 11000 && "result" in err) {
+          return (err as { result: Awaited<ReturnType<typeof model.bulkWrite>> }).result;
+        }
+        throw err;
+      }
+    },
 
     /** Общее количество пользователей в коллекции. */
     count: () => model.countDocuments().exec(),
